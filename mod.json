@@ -1,0 +1,14 @@
+{
+	"geode": "3.4.0",
+	"gd": {
+		"win": "2.206",
+		"android": "2.206",
+		"mac": "2.206",
+		"ios": "2.206"
+	},
+	"id": "km7dev.server_api",
+	"name": "Server API",
+	"version": "v1.0.0-alpha.1",
+	"developer": "km7dev",
+	"description": "An API for using official and unofficial GD servers"
+}
