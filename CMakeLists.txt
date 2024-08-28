@@ -7,13 +7,15 @@ set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 project(ServerAPI VERSION 1.0.0)
 
 file(GLOB SOURCES
-    src/utils/*.hpp
     src/hooks/*.cpp
-    src/ui/*.cpp
-    src/ui/*.hpp
+    src/ServerAPI.cpp
 )
 
 add_library(${PROJECT_NAME} SHARED ${SOURCES})
+
+if (PROJECT_IS_TOP_LEVEL)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE KM7DEV_SERVER_API_EXPORTING)
+endif()
 
 if (NOT DEFINED ENV{GEODE_SDK})
     message(FATAL_ERROR "Unable to find Geode SDK! Please define GEODE_SDK environment variable to point to Geode")
