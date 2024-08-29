@@ -18,5 +18,8 @@ std::string ServerAPI::getServerURL() {
 
 $on_mod(Loaded) {
     std::string url = Mod::get()->getSavedValue<std::string>("server");
+    if (url == "") {
+        url = "https://www.boomlings.com/database/"
+    }
     ServerAPI::get()->setServerURL(url);
 }
