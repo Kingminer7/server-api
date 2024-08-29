@@ -9,7 +9,7 @@ ServerAPI * ServerAPI::instance = nullptr;
 void ServerAPI::setServerURL(std::string url) {
     if (!url.ends_with("/")) url = url + "/";
     this->server = url;
-    Mod::get()->setSettingValue<std::string>("server", url);
+    Mod::get()->getSavedValue<std::string>("server", url);
 }
 
 std::string ServerAPI::getServerURL() {
@@ -17,6 +17,6 @@ std::string ServerAPI::getServerURL() {
 }
 
 $on_mod(Loaded) {
-    std::string url = Mod::get()->getSettingValue<std::string>("server");
+    std::string url = Mod::get()->getSavedValue<std::string>("server");
     ServerAPI::get()->setServerURL(url);
 }
