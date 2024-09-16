@@ -1,2 +1,2 @@
 # Server API
-Please don't download this yet. It is literally just the example mod so far.
+API to communicate with servers, allowing public and private server support.
