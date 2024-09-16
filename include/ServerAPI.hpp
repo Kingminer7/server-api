@@ -13,9 +13,12 @@
 #endif
 
 class SERVER_API_DLL ServerAPI {
+    private:
+        // <id, <url, prio>>
+        std::map<int, std::pair<std::string, int>> overrides = {};
+        int nextId = 0;
     protected: 
         static ServerAPI *instance;
-        std::string server = "https://www.boomlings.com/database/";
 	public:
 
         static ServerAPI *get() {
@@ -25,5 +28,5 @@ class SERVER_API_DLL ServerAPI {
             return instance;
         };
         std::string getServerURL();
-        void setServerURL(std::string url);
+        int setServerURL(std::string url, int priority = 0);
 };
