@@ -15,16 +15,5 @@
 		"include": [
 			"include/*.hpp"
 		]
-	},
-	"settings": {
-		"server": {
-			"name": "Emergency Reset",
-			"description": "Set the server back to the original servers in case of emergency. Does nothing if already at normal GD servers.",
-			"type": "string",
-			"default": "https://www.boomlings.com/database/",
-			"one-of": [
-				"https://www.boomlings.com/database/"
-			]
-		}
 	}
 }
