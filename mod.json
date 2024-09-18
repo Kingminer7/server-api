@@ -10,7 +10,7 @@
 	"name": "Server API",
 	"version": "v1.0.0-alpha.2",
 	"developer": "km7dev",
-	"description": "An API for using official and unofficial GD servers",
+	"description": "An API for using other GD servers",
 	"api": {
 		"include": [
 			"include/*.hpp"

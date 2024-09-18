@@ -28,5 +28,11 @@ class SERVER_API_DLL ServerAPI {
             return instance;
         };
         std::string getServerURL();
-        int setServerURL(std::string url, int priority = 0);
+        int getServerPrio();
+        std::string getURLById(int id);
+        int getPrioById(int id);
+        int setURL(std::string url, int priority = 0);
+        void updateURLAndPrio(int id, std::string url, int priority);
+        void updatePrio(int id, int priority);
+        void updateURL(int id, std::string url);
 };
