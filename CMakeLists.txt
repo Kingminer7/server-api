@@ -9,6 +9,7 @@ project(ServerAPI VERSION 1.0.0)
 file(GLOB SOURCES
     src/hooks/*.cpp
     src/ServerAPI.cpp
+    src/PopupSetting.cpp
 )
 
 add_library(${PROJECT_NAME} SHARED ${SOURCES})
