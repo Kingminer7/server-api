@@ -39,7 +39,7 @@ std::string ServerAPI::getURLById(int id) {
             return urlPrio.first;
         }
     }
-    return nullptr;
+    return "";
 }
 
 int ServerAPI::getPrioById(int id) {

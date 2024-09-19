@@ -15,5 +15,12 @@
 		"include": [
 			"include/*.hpp"
 		]
+	},
+	"settings": {
+		"open-debug": {
+			"type": "server_api:button",
+			"name": "Open Debug Menu",
+			"default": true
+		}
 	}
 }
