@@ -15,11 +15,5 @@
 		"include": [
 			"include/*.hpp"
 		]
-	},
-	"settings": {
-		"open-debug": {
-			"type": "custom:popup-setting",
-			"name": "Open Debug Menu"
-		}
 	}
 }
