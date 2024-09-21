@@ -6,7 +6,7 @@ using namespace geode::prelude;
 
 ServerAPI * ServerAPI::instance = nullptr;
 
-int ServerAPI::setURL(std::string url, int priority) {
+int ServerAPI::registerURL(std::string url, int priority) {
     if (!url.ends_with("/")) url = url + "/";
     // <id, <url, prio>>
     this->overrides[this->nextId] = std::pair(url, priority);
@@ -51,7 +51,7 @@ int ServerAPI::getPrioById(int id) {
     return 0;
 }
 
-std::string ServerAPI::getServerURL() {
+std::string ServerAPI::getCurrentURL() {
     std::pair<std::string, int> highestPrioUrl = std::make_pair("https://www.boomlings.com/database/", INT_MIN);
     
     for (const auto& [id, urlPrio] : overrides) {
@@ -62,4 +62,12 @@ std::string ServerAPI::getServerURL() {
     }
     
     return highestPrioUrl.first;
+}
+
+void ServerAPI::removeURL(int id) {
+    this->overrides.erase(id);
+}
+
+std::map<int, std::pair<std::string, int>> ServerAPI::getAllServers() {
+    return overrides;
 }

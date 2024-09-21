@@ -1,42 +1,8 @@
-/*mod.json
-    ,
-	"settings": {
-		"open-debug": {
-			"type": "custom:popup-setting",
-			"name": "Open Debug Menu"
-		}
-	}
-*/
-
 using namespace geode::prelude;
-
-class DebugPopup : public geode::Popup<> {
-    protected:
-        bool setup() override {
-            this->setTitle("Hi mom!");
-
-            auto label = CCLabelBMFont::create("ehhehheheehheheheheheheehhehehehe<cr>hehehheehhehe</c>hehehehe", "bigFont.fnt");
-            label->setPosition(this->m_mainLayer->getContentSize() / 2);
-            this->m_mainLayer->addChild(label);
-
-            return true;
-        }
-
-    public:
-        static DebugPopup* create() {
-            auto ret = new DebugPopup();
-            if (ret->initAnchored(240.f, 160.f)) {
-                ret->autorelease();
-                return ret;
-            }
-
-            delete ret;
-            return nullptr;
-        }
-};
 
 #include <Geode/loader/SettingV3.hpp>
 #include <Geode/loader/Mod.hpp>
+#include "../include/ServerAPI.hpp"
 
 class PopupSetting : public SettingV3 {
 public:
@@ -102,7 +68,12 @@ protected:
         m_buttonSprite->setColor(shouldEnable ? ccWHITE : ccGRAY);
     }
     void onButton(CCObject*) {
-        DebugPopup::create()->show();
+        // DebugPopup::create()->show();
+        std::string str = "";
+        for (const auto& [uid, urlPrio] : ServerAPI::get()->getAllServers()) {
+            str += fmt::format("{}: {}\n", urlPrio.first, urlPrio.second);
+        }
+        geode::MDPopup::create("Server API Debug", str, "Close")->show();
     }
 
     void onCommit() override {}

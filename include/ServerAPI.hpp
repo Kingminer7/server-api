@@ -15,10 +15,10 @@
 class SERVER_API_DLL ServerAPI {
     private:
         // <id, <url, prio>>
-        std::map<int, std::pair<std::string, int>> overrides = {};
         int nextId = 0;
     protected: 
         static ServerAPI *instance;
+        std::map<int, std::pair<std::string, int>> overrides = {};
 	public:
 
         static ServerAPI *get() {
@@ -27,12 +27,14 @@ class SERVER_API_DLL ServerAPI {
             }
             return instance;
         };
-        std::string getServerURL();
-        int getServerPrio();
+        std::string getCurrentURL();
+        int getCurrentPrio();
         std::string getURLById(int id);
         int getPrioById(int id);
-        int setURL(std::string url, int priority = 0);
+        int registerURL(std::string url, int priority = 0);
+        void removeURL(int id);
         void updateURLAndPrio(int id, std::string url, int priority);
         void updatePrio(int id, int priority);
         void updateURL(int id, std::string url);
+        std::map<int, std::pair<std::string, int>> getAllServers();
 };

@@ -8,12 +8,18 @@
 	},
 	"id": "km7dev.server_api",
 	"name": "Server API",
-	"version": "v1.0.0-alpha.2",
+	"version": "v1.0.0-alpha.3",
 	"developer": "km7dev",
 	"description": "An API for using other GD servers",
 	"api": {
 		"include": [
 			"include/*.hpp"
 		]
+	},
+	"settings": {
+		"open-debug": {
+			"type": "custom:popup-setting",
+			"name": "Open Debug Menu"
+		}
 	}
 }
