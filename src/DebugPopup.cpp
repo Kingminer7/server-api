@@ -1,8 +1,8 @@
-using namespace geode::prelude;
-
 #include "../include/ServerAPI.hpp"
 #include <Geode/loader/Mod.hpp>
 #include <Geode/loader/SettingV3.hpp>
+
+using namespace geode::prelude;
 
 class PopupSetting : public SettingV3 {
 public:
