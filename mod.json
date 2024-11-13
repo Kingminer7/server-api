@@ -8,7 +8,7 @@
   },
   "id": "km7dev.server_api",
   "name": "Server API",
-  "version": "v1.0.0",
+  "version": "v1.0.1",
   "developer": "km7dev",
   "description": "An API for using other GD servers",
   "api": {
