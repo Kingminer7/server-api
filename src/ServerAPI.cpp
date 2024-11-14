@@ -71,3 +71,7 @@ void ServerAPI::removeURL(int id) {
 std::map<int, std::pair<std::string, int>> ServerAPI::getAllServers() {
     return overrides;
 }
+
+std::string ServerAPI::getBaseUrl() {
+    return baseUrl;
+}
