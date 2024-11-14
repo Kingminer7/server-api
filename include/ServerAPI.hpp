@@ -16,6 +16,8 @@ class SERVER_API_DLL ServerAPI {
     private:
         // <id, <url, prio>>
         int nextId = 0;
+        std::string baseUrl;
+        std::string secondaryUrl;
     protected: 
         static ServerAPI *instance;
         std::map<int, std::pair<std::string, int>> overrides = {};
@@ -25,6 +27,25 @@ class SERVER_API_DLL ServerAPI {
             if (!instance) {
                 instance = new ServerAPI();
             }
+            #ifdef GEODE_IS_WINDOWS
+                static_assert(GEODE_COMP_GD_VERSION == 22074, "Unsupported GD version");
+                instance->baseUrl = (char*)(geode::base::get() + 0x53ea48);
+            #elif defined(GEODE_IS_ARM_MAC)
+                static_assert(GEODE_COMP_GD_VERSION == 22060, "Unsupported GD version");
+                instance->baseUrl = (char*)(geode::base::get() + 0x78bf98);
+            #elif defined(GEODE_IS_INTEL_MAC)
+                static_assert(GEODE_COMP_GD_VERSION == 22060, "Unsupported GD version");
+                instance->baseUrl = (char*)(geode::base::get() + 0x875058);
+            #elif defined(GEODE_IS_ANDROID64)
+                static_assert(GEODE_COMP_GD_VERSION == 22060, "Unsupported GD version");
+                instance->baseUrl = (char*)(geode::base::get() + 0xE8D270);
+            #elif defined(GEODE_IS_ANDROID32)
+                static_assert(GEODE_COMP_GD_VERSION == 22060, "Unsupported GD version");
+                instance->baseUrl = (char*)(geode::base::get() + 0x944A78);
+            #else
+                static_assert(false, "Unsupported platform");
+            #endif
+            if(instance->baseUrl.size() > 35) instance->baseUrl = instance->baseUrl.substr(0, 35);
             return instance;
         };
         std::string getCurrentURL();
@@ -36,5 +57,7 @@ class SERVER_API_DLL ServerAPI {
         void updateURLAndPrio(int id, std::string url, int priority);
         void updatePrio(int id, int priority);
         void updateURL(int id, std::string url);
+        std::string getBaseUrl();
         std::map<int, std::pair<std::string, int>> getAllServers();
+        bool firstML = true;
 };
