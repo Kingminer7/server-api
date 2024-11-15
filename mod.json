@@ -1,14 +1,13 @@
 {
-  "geode": "4.0.0-alpha.1",
+  "geode": "4.0.0-beta.1",
   "gd": {
     "win": "2.2074",
     "android": "2.2074",
-    "mac": "2.2074",
-    "ios": "2.2074"
+    "mac": "2.2074"
   },
   "id": "km7dev.server_api",
   "name": "Server API",
-  "version": "v1.0.1",
+  "version": "v1.0.2",
   "developer": "km7dev",
   "description": "An API for using other GD servers",
   "api": {
