@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Geode/Geode.hpp>
+#include <WinNls.h>
 
 #ifdef GEODE_IS_WINDOWS
     #ifdef KM7DEV_SERVER_API_EXPORTING
@@ -22,7 +23,6 @@ class SERVER_API_DLL ServerAPI {
         static ServerAPI *instance;
         std::map<int, std::pair<std::string, int>> overrides = {};
 	public:
-
         static ServerAPI *get() {
             if (!instance) {
                 instance = new ServerAPI();
@@ -50,6 +50,7 @@ class SERVER_API_DLL ServerAPI {
         };
         std::string getCurrentURL();
         int getCurrentPrio();
+        int getCurrentId();
         std::string getURLById(int id);
         int getPrioById(int id);
         int registerURL(std::string url, int priority = 0);

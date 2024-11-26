@@ -2,8 +2,10 @@
 API to communicate with servers, allowing public and private server support.
 
 ## Usage (Developer)
+Servers are returned as a struct with 3 values: url, prio, and id.<br/>
+`server.url` is the actual server url, `server.priority` is the server priority, and `server.id` is the id used internally by Server API.<br/>
 ### Getting the server currently in use
-To get the currently used server, use `ServerAPI::get()->getCurrentURL()`. Whatever server has the highest priority is returned.<br/>
+To get the currently used server, use `ServerAPIEvents::getCurrentServer()`. Whatever server has the highest priority is returned.<br/>
 Example of getting something from the servers, uses Geode's web api
 ```c++
 #include <Geode/binding/GJAccountManager.hpp>
@@ -11,7 +13,7 @@ Example of getting something from the servers, uses Geode's web api
 #include <Geode/utils/web.hpp>
 #include <Geode/loader/Event.hpp>
 
-#include <km7dev.server_api/include/ServerAPI.hpp>
+#include <km7dev.server_api/include/ServerAPIEvents.hpp>
 
 using namespace geode::prelude;
 
@@ -32,7 +34,7 @@ class $modify(MenuLayer) {
         });
 
         // structure: server + "endpoint"
-        auto url = ServerAPI::get()->getCurrentURL() + "getGJUserInfo20.php";
+        auto url = ServerAPIEvents::getCurrentServer().url + "getGJUserInfo20.php";
         auto req = web::WebRequest();
         req.bodyString(fmt::format("secret=Wmfd2893gb7&targetAccountID={}", GJAccountManager::get()->m_accountID));
         req.userAgent(""),
@@ -41,12 +43,11 @@ class $modify(MenuLayer) {
     }
 };
 ```
-You can also get the current server's priority, if you need it. `ServerAPI::get()->getCurrentPrio()`
 ### Registering a server
-To register a server, it's simple. Just call `ServerAPI::get()->registerURL(url, priority)`. It returns an int, which is the id of the registered server. Store this if you plan to edit or remove your URL.</br>
+To register a server, it's simple. Just call `ServerAPIEvents::registerServer(url, priority)`. It returns an int, which is the id of the registered server. Store this if you plan to edit or remove your URL.</br>
 Here's an example.
 ```c++
-#include <km7dev.server_api/include/ServerAPI.hpp>
+#include <km7dev.server_api/include/ServerAPIEvents.hpp>
 
 class ExampleClass {
     private:
@@ -56,17 +57,18 @@ class ExampleClass {
         void init()
         {
             // This server will be used if all other servers have a priority less than 10.
-            this->serverId = ServerAPI::get()->registerURL("https://my-epic-gd-servers.google.com", 10);
+            this->serverId = ServerAPIEvents::registerServer("https://my-epic-gd-servers.google.com", 10);
         }
 };
 ```
 ### Editing a server
-To edit a server, there are multiple functions. The ID in all of these is the one given by `ServerAPI::get()->registerURL`.
-- `ServerAPI::get()->updateURL(id, url)` - This just updates the URL.
-- `ServerAPI::get()->updatePrio(id, priority)` - This just updates the priority. 
-- `ServerAPI::get()->updateURLAndPrio(id, url, priority)` - This updates the URL and priority.
+To edit a server, use `ServerAPIEvents::updateServer` with parameters based on what you're updating. The ID in these is the one given in server structs.
+- `ServerAPIEvents::updateServer(id, url)` - This just updates the URL.
+- `ServerAPIEvents::updateServer(id, priority)` - This just updates the priority. 
+- `ServerAPIEvents::updateServer(id, url, priority)` - This updates the URL and priority.
+- `ServerAPIEvents::updateServer(server)` - This updates the URL and priority, although using a Server struct.
 ```c++
-#include <km7dev.server_api/include/ServerAPI.hpp>
+#include <km7dev.server_api/include/ServerAPIEvents.hpp>
 
 class ExampleClass {
     private:
@@ -75,11 +77,17 @@ class ExampleClass {
         void myFunc()
         {
             // Updating just the URL
-            ServerAPI::get()->updateURL(this->serverId, "https://my-other-epic-servers.bing.com");
+            ServerAPIEvents::updateServer(this->serverId, "https://my-other-epic-servers.bing.com");
             // Updating just the priority
-            ServerAPI::get()->updatePriority(this->serverId, 6);
+            ServerAPIEvents::updateServer(this->serverId, 6);
             // Updating the URL and priority
-            ServerAPI::get()->updateURL(this->serverId, "https://my-other-epic-servers.bing.com", 6);
+            ServerAPIEvents::updateServer(this->serverId, "https://my-other-epic-gd-servers.bing.com", 10);
+            // Updating the URL and priority with a server struct
+            ServerAPIEvents::updateServer({
+                id: this->serverId,
+                url: "https://my-other-epic-gd-servers.bing.com",
+                priority: 6,
+            });
         }
 };
 ```
@@ -91,9 +99,9 @@ void myFunc()
 {
     // Getting the URL.
     // If there isn't a url with this id, it'll return ""
-    auto url = ServerAPI::get()->getUrlById(1);
-    // If there isn't a url with this id, it'll return 0
-    auto url = ServerAPI::get()->getUrlById(1);
+    auto url = ServerAPIEvents::getServerById(1).url;
+    // If there isn't a server with this id, it'll return 0
+    auto prio = ServerAPIEvents::getServerById(1).priority;
 }
 ```
 ### Removing a server
@@ -107,7 +115,7 @@ class ExampleClass {
     public: 
         void myFunc()
         {
-            ServerAPI::get()->removeURL(this->serverId);
+            ServerAPIEvents::removeServer(this->serverId);
         }
 };
 ```
@@ -122,7 +130,7 @@ class ExampleClass {
     public: 
         void myFunc()
         {
-            auto servers = ServerAPI::get()->getAllServers();
+            auto servers = ServerAPIEvents::getRegisteredServers();
             
             // do something with the servers
         }
