@@ -1,3 +1,5 @@
+#pragma once
+
 using namespace geode::prelude;
 
 #include <WinNls.h>
