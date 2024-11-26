@@ -1,6 +1,9 @@
 # Server API
 API to communicate with servers, allowing public and private server support.
 
+## Credits
+- [GD Noxi](https://www.youtube.com/channel/UCdZjMv0DCgkFQz_lklsYYJw): Fix for NCS Music
+
 ## Usage (Developer)
 Servers are returned as a struct with 3 values: url, prio, and id.<br/>
 `server.url` is the actual server url, `server.priority` is the server priority, and `server.id` is the id used internally by Server API.<br/>

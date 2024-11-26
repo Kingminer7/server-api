@@ -7,7 +7,7 @@
   },
   "id": "km7dev.server_api",
   "name": "Server API",
-  "version": "v1.0.2",
+  "version": "v1.0.3",
   "developer": "km7dev",
   "description": "An API for using other GD servers",
   "api": {
@@ -26,6 +26,12 @@
     "open-debug": {
       "type": "custom:popup-setting",
       "name": "Open Debug Menu"
+    },
+    "audio-fix": {
+      "type": "bool",
+      "name": "Disable NCS Fix",
+      "description": "Disables replacing Newgrounds download URLs with Private Server URLs.",
+      "default": false
     }
   }
 }
