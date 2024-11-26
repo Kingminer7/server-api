@@ -5,7 +5,7 @@ API to communicate with servers, allowing public and private server support.
 - [GD Noxi](https://www.youtube.com/channel/UCdZjMv0DCgkFQz_lklsYYJw): Fix for NCS Music
 
 ## Usage (Developer)
-### [Put this in your mod files if you want an optional dependency.](https://github.com/Kingminer7/server-api/edit/main/include/ServerAPIEvents.hpp)
+### [Put this in your mod if you want an optional dependency.](https://github.com/Kingminer7/server-api/edit/main/include/ServerAPIEvents.hpp)
 Servers are returned as a struct with 3 values: url, prio, and id.<br/>
 `server.url` is the actual server url, `server.priority` is the server priority, and `server.id` is the id used internally by Server API.<br/>
 ### Getting the server currently in use
