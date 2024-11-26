@@ -5,6 +5,7 @@ API to communicate with servers, allowing public and private server support.
 - [GD Noxi](https://www.youtube.com/channel/UCdZjMv0DCgkFQz_lklsYYJw): Fix for NCS Music
 
 ## Usage (Developer)
+### Put this in your mod files if you want an optional dependency.
 Servers are returned as a struct with 3 values: url, prio, and id.<br/>
 `server.url` is the actual server url, `server.priority` is the server priority, and `server.id` is the id used internally by Server API.<br/>
 ### Getting the server currently in use
@@ -17,6 +18,8 @@ Example of getting something from the servers, uses Geode's web api
 #include <Geode/loader/Event.hpp>
 
 #include <km7dev.server_api/include/ServerAPIEvents.hpp>
+// or, if you dont want to require dep
+#include "ServerAPIEvents.hpp"
 
 using namespace geode::prelude;
 
@@ -51,6 +54,8 @@ To register a server, it's simple. Just call `ServerAPIEvents::registerServer(ur
 Here's an example.
 ```c++
 #include <km7dev.server_api/include/ServerAPIEvents.hpp>
+// or, if you dont want to require dep
+#include "ServerAPIEvents.hpp"
 
 class ExampleClass {
     private:
@@ -72,6 +77,8 @@ To edit a server, use `ServerAPIEvents::updateServer` with parameters based on w
 - `ServerAPIEvents::updateServer(server)` - This updates the URL and priority, although using a Server struct.
 ```c++
 #include <km7dev.server_api/include/ServerAPIEvents.hpp>
+// or, if you dont want to require dep
+#include "ServerAPIEvents.hpp"
 
 class ExampleClass {
     private:
@@ -111,6 +118,8 @@ void myFunc()
 If you're done with the server and want to remove it, use `ServerAPI::get()->removeServer(id)`.
 ```c++
 #include <km7dev.server_api/include/ServerAPI.hpp>
+// or, if you dont want to require dep
+#include "ServerAPIEvents.hpp"
 
 class ExampleClass {
     private:
@@ -126,6 +135,8 @@ class ExampleClass {
 If you want to have info about the various servers, use `ServerAPI::get()->getAllServers();`
 ```c++
 #include <km7dev.server_api/include/ServerAPI.hpp>
+// or, if you dont want to require dep
+#include "ServerAPIEvents.hpp"
 
 class ExampleClass {
     private:
