@@ -2,8 +2,6 @@
 
 using namespace geode::prelude;
 
-#include <WinNls.h>
-
 #ifdef GEODE_IS_WINDOWS
     #ifdef KM7DEV_SERVER_API_EXPORTING
         #define SERVER_API_DLL __declspec(dllexport)
