@@ -43,7 +43,7 @@ class SERVER_API_DLL ServerAPI {
             #else
                 static_assert(false, "Unsupported platform");
             #endif
-            if(instance->baseUrl.size() > 37) instance->baseUrl = instance->baseUrl.substr(0, 36);
+            if(instance->baseUrl.size() > 36) instance->baseUrl = instance->baseUrl.substr(0, 35);
             return instance;
         };
         std::string getCurrentURL();
