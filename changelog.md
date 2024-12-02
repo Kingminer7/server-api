@@ -1,3 +1,5 @@
+# 1.0.4
+- Fix some servers, most notably fruitspace servers.
 # 1.0.3
 - Add event based API for developers
 - Fix NCS Music
