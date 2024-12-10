@@ -1,4 +1,5 @@
 # Server API
+## This is not the GDPS Switcher mod. This is meant for developers.
 API to communicate with servers, allowing public and private server support.
 
 ## Credits
