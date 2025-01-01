@@ -8,6 +8,7 @@ class $modify(CCHttpClient) {
     {
 	    log::info("Http Request");
 		std::string url = req->getUrl();
+		log::info("{}", ServerAPI::get()->getBaseUrl());
 		auto newUrl = ServerAPI::get()->getCurrentURL();
 		if(url.starts_with("https://www.newgrounds.com/audio/download/") && !Mod::get()->getSettingValue<bool>("audio-fix")) {
 			if (ServerAPI::get()->getCurrentURL() != "https://www.boomlings.com/database/") {
