@@ -6,6 +6,7 @@ using namespace geode::prelude;
 class $modify(CCHttpClient) {
 	void send(CCHttpRequest* req)
     {
+	    log::info("Http Request");
 		std::string url = req->getUrl();
 		auto newUrl = ServerAPI::get()->getCurrentURL();
 		if(url.starts_with("https://www.newgrounds.com/audio/download/") && !Mod::get()->getSettingValue<bool>("audio-fix")) {
