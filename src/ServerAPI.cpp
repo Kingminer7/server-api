@@ -110,6 +110,7 @@ ServerAPI *ServerAPI::get() {
             if (!instance) {
                 instance = new ServerAPI();
             }
+            log::info("{}", geode::lite::isLite());
             if (geode::lite::isLite()) {
                 instance->baseUrl = "https://www.boomlings.com/database";
                 log::warn("Server API running in lite mode!");
