@@ -12,6 +12,6 @@ namespace geode::lite {
   inline bool isLite() {
       auto evt = IsLiteEvent();
       evt.post();
-      return IsLiteEvent.isLite;
+      return evt.isLite;
   }
 }
