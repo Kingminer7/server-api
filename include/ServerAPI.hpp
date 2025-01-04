@@ -25,6 +25,7 @@ class SERVER_API_DLL ServerAPI {
             if (!instance) {
                 instance = new ServerAPI();
             }
+            geode::log::info("{}", defined(GEODE_IS_LITE));
             #ifdef GEODE_IS_WINDOWS
                 static_assert(GEODE_COMP_GD_VERSION == 22074, "Unsupported GD version");
                 instance->baseUrl = (char*)(geode::base::get() + 0x53ea48);
