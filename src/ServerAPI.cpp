@@ -112,8 +112,15 @@ ServerAPI *ServerAPI::get() {
             }
             log::info("{}", geode::lite::isLite());
             if (geode::lite::isLite()) {
-                instance->baseUrl = "https://www.boomlings.com/database";
-                log::warn("Server API running in lite mode!");
+                #ifdef GEODE_IS_ANDROID64
+                    static_assert(GEODE_COMP_GD_VERSION == 22074, "Unsupported GD version");
+                    instance->baseUrl = (char*)(geode::base::get() + 0xE9CF78);
+                #elif defined(GEODE_IS_ANDROID32)
+                    static_assert(GEODE_COMP_GD_VERSION == 22074, "Unsupported GD version");
+                    instance->baseUrl = (char*)(geode::base::get() + 0x95039f);
+                #else
+                    static_assert(false, "Unsupported platform");
+                #endif
             } else {
             #ifdef GEODE_IS_WINDOWS
                 static_assert(GEODE_COMP_GD_VERSION == 22074, "Unsupported GD version");
