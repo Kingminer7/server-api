@@ -1,5 +1,10 @@
 #pragma once
 
+#define IS_DEFINED(MACRO) \
+    ({ \
+        __builtin_constant_p(MACRO); \
+    })
+
 #include <Geode/Geode.hpp>
 #ifdef GEODE_IS_WINDOWS
     #ifdef KM7DEV_SERVER_API_EXPORTING
@@ -25,7 +30,7 @@ class SERVER_API_DLL ServerAPI {
             if (!instance) {
                 instance = new ServerAPI();
             }
-            geode::log::info("{}", GEODE_IS_LITE);
+            geode::log::info("{}", IS_DEFINED(GEODE_IS_LITE));
             #ifdef GEODE_IS_WINDOWS
                 static_assert(GEODE_COMP_GD_VERSION == 22074, "Unsupported GD version");
                 instance->baseUrl = (char*)(geode::base::get() + 0x53ea48);
