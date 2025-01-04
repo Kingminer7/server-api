@@ -118,8 +118,6 @@ ServerAPI *ServerAPI::get() {
                 #elif defined(GEODE_IS_ANDROID32)
                     static_assert(GEODE_COMP_GD_VERSION == 22074, "Unsupported GD version");
                     instance->baseUrl = (char*)(geode::base::get() + 0x95039f);
-                #else
-                    static_assert(false, "Unsupported platform");
                 #endif
             } else {
             #ifdef GEODE_IS_WINDOWS
