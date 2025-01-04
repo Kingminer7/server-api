@@ -26,32 +26,7 @@ class SERVER_API_DLL ServerAPI {
         static ServerAPI *instance;
         std::map<int, std::pair<std::string, int>> overrides = {};
 	public:
-        static ServerAPI *get() {
-            if (!instance) {
-                instance = new ServerAPI();
-            }
-            geode::log::info("{}", IS_DEFINED(GEODE_IS_LITE));
-            #ifdef GEODE_IS_WINDOWS
-                static_assert(GEODE_COMP_GD_VERSION == 22074, "Unsupported GD version");
-                instance->baseUrl = (char*)(geode::base::get() + 0x53ea48);
-            #elif defined(GEODE_IS_ARM_MAC)
-                static_assert(GEODE_COMP_GD_VERSION == 22074, "Unsupported GD version");
-                instance->baseUrl = (char*)(geode::base::get() + 0x7749fb);
-            #elif defined(GEODE_IS_INTEL_MAC)
-                static_assert(GEODE_COMP_GD_VERSION == 22074, "Unsupported GD version");
-                instance->baseUrl = (char*)(geode::base::get() + 0x8516bf);
-            #elif defined(GEODE_IS_ANDROID64)
-                static_assert(GEODE_COMP_GD_VERSION == 22074, "Unsupported GD version");
-                instance->baseUrl = (char*)(geode::base::get() + 0xEA2988);
-            #elif defined(GEODE_IS_ANDROID32)
-                static_assert(GEODE_COMP_GD_VERSION == 22074, "Unsupported GD version");
-                instance->baseUrl = (char*)(geode::base::get() + 0x952E9E);
-            #else
-                static_assert(false, "Unsupported platform");
-            #endif
-            if(instance->baseUrl.size() > 36) instance->baseUrl = instance->baseUrl.substr(0, 35);
-            return instance;
-        };
+        static ServerAPI *get();
         std::string getCurrentURL();
         int getCurrentPrio();
         int getCurrentId();
