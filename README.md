@@ -19,7 +19,7 @@ Example of getting something from the servers, uses Geode's web api
 #include <Geode/loader/Event.hpp>
 
 #include <km7dev.server_api/include/ServerAPIEvents.hpp>
-// or, if you dont want to require dep
+// or, if you dont want to require dep and have the header in your source
 #include "ServerAPIEvents.hpp"
 
 using namespace geode::prelude;
@@ -55,18 +55,18 @@ To register a server, it's simple. Just call `ServerAPIEvents::registerServer(ur
 Here's an example.
 ```c++
 #include <km7dev.server_api/include/ServerAPIEvents.hpp>
-// or, if you dont want to require dep
+// or, if you dont want to require dep and have the header in your source
 #include "ServerAPIEvents.hpp"
 
 class ExampleClass {
     private:
-        // Storing the ID for later usage.
-        int serverId;
+        // Storing the server for later usage. Changing values here ***does not*** update values in Server API unles you use updateServer (documented below)
+        ServerAPIEvents::Server server;
     public: 
         void init()
         {
             // This server will be used if all other servers have a priority less than 10.
-            this->serverId = ServerAPIEvents::registerServer("https://my-epic-gd-servers.google.com", 10);
+            this->server = ServerAPIEvents::registerServer("https://my-epic-gd-servers.google.com", 10);
         }
 };
 ```
@@ -78,24 +78,24 @@ To edit a server, use `ServerAPIEvents::updateServer` with parameters based on w
 - `ServerAPIEvents::updateServer(server)` - This updates the URL and priority, although using a Server struct.
 ```c++
 #include <km7dev.server_api/include/ServerAPIEvents.hpp>
-// or, if you dont want to require dep
+// or, if you dont want to require dep and have the header in your source
 #include "ServerAPIEvents.hpp"
 
 class ExampleClass {
     private:
-        int serverId;
+        ServerAPIEvents::Server server;
     public: 
         void myFunc()
         {
             // Updating just the URL
-            ServerAPIEvents::updateServer(this->serverId, "https://my-other-epic-servers.bing.com");
+            ServerAPIEvents::updateServer(this->server.id, "https://my-other-epic-servers.bing.com");
             // Updating just the priority
-            ServerAPIEvents::updateServer(this->serverId, 6);
+            ServerAPIEvents::updateServer(this->server.id, 6);
             // Updating the URL and priority
-            ServerAPIEvents::updateServer(this->serverId, "https://my-other-epic-gd-servers.bing.com", 10);
+            ServerAPIEvents::updateServer(this->server.id, "https://my-other-epic-gd-servers.bing.com", 10);
             // Updating the URL and priority with a server struct
             ServerAPIEvents::updateServer({
-                id: this->serverId,
+                id: this->server.id,
                 url: "https://my-other-epic-gd-servers.bing.com",
                 priority: 6,
             });
@@ -119,16 +119,16 @@ void myFunc()
 If you're done with the server and want to remove it, use `ServerAPI::get()->removeServer(id)`.
 ```c++
 #include <km7dev.server_api/include/ServerAPI.hpp>
-// or, if you dont want to require dep
+// or, if you dont want to require dep and have the header in your source
 #include "ServerAPIEvents.hpp"
 
 class ExampleClass {
     private:
-        int serverId;
+        ServerAPIEvents::Server server;
     public: 
         void myFunc()
         {
-            ServerAPIEvents::removeServer(this->serverId);
+            ServerAPIEvents::removeServer(this->server.id);
         }
 };
 ```
@@ -136,12 +136,10 @@ class ExampleClass {
 If you want to have info about the various servers, use `ServerAPI::get()->getAllServers();`
 ```c++
 #include <km7dev.server_api/include/ServerAPI.hpp>
-// or, if you dont want to require dep
+// or, if you dont want to require dep and have the header in your source
 #include "ServerAPIEvents.hpp"
 
 class ExampleClass {
-    private:
-        int serverId;
     public: 
         void myFunc()
         {
