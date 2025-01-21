@@ -1,10 +1,5 @@
 #pragma once
 
-#define IS_DEFINED(MACRO) \
-    ({ \
-        __builtin_constant_p(MACRO); \
-    })
-
 #include <Geode/Geode.hpp>
 #ifdef GEODE_IS_WINDOWS
     #ifdef KM7DEV_SERVER_API_EXPORTING
