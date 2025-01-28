@@ -22,7 +22,7 @@
 //         if (ServerAPI::get()->firstML == true) {
 //         ServerAPI::get()->firstML = false;
 //         log::info("{}", ServerAPI::get()->getBaseUrl());
-//         if (ServerAPI::get()->getBaseUrl() != "https://www.boomlings.com/database/") {
+//         if (ServerAPI::get()->getBaseUrl() != "NONE_REGISTERED") {
 //         Loader::get()->queueInMainThread([this] {
 //             FLAlertLayer::create(
 //                 "Modified URL Warning",
