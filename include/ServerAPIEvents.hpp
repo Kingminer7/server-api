@@ -2,6 +2,16 @@
 
 using namespace geode::prelude;
 
+#ifdef GEODE_IS_WINDOWS
+    #ifdef KM7DEV_SERVER_API_EXPORTING
+        #define SERVER_API_DLL __declspec(dllexport)
+    #else
+        #define SERVER_API_DLL __declspec(dllimport)
+    #endif
+#else
+    #define SERVER_API_DLL __attribute__((visibility("default")))
+#endif
+
 // thx prevter for the help
 
 struct GetCurrentServerEvent : geode::Event {
