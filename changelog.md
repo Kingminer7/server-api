@@ -1,3 +1,5 @@
+# 1.0.5
+- Fix server automatically setting to RobTop's when on a url patched game
 # 1.0.4
 - Fix some servers, most notably fruitspace servers.
 # 1.0.3

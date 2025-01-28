@@ -54,7 +54,7 @@ int ServerAPI::getPrioById(int id) {
 }
 
 std::string ServerAPI::getCurrentURL() {
-    std::pair<std::string, int> highestPrioUrl = std::make_pair("https://www.boomlings.com/database/", INT_MIN);
+    std::pair<std::string, int> highestPrioUrl = std::make_pair("NONE_REGISTERED", INT_MIN);
     
     for (const auto& [id, urlPrio] : overrides) {
         const auto& [url, prio] = urlPrio;
@@ -67,7 +67,7 @@ std::string ServerAPI::getCurrentURL() {
 }
 
 int ServerAPI::getCurrentPrio() {
-    std::pair<std::string, int> highestPrioUrl = std::make_pair("https://www.boomlings.com/database/", INT_MIN);
+    std::pair<std::string, int> highestPrioUrl = std::make_pair("NONE_REGISTERED", INT_MIN);
     
     for (const auto& [id, urlPrio] : overrides) {
         const auto& [url, prio] = urlPrio;
@@ -80,7 +80,7 @@ int ServerAPI::getCurrentPrio() {
 }
 
 int ServerAPI::getCurrentId() {
-    std::pair<std::string, int> highestPrioUrl = std::make_pair("https://www.boomlings.com/database/", INT_MIN);
+    std::pair<std::string, int> highestPrioUrl = std::make_pair("NONE_REGISTERED", INT_MIN);
     int highestPrioId = 0;
     
     for (const auto& [id, urlPrio] : overrides) {
@@ -110,7 +110,6 @@ ServerAPI *ServerAPI::get() {
             if (!instance) {
                 instance = new ServerAPI();
             }
-            log::info("{}", geode::lite::isLite());
             if (geode::lite::isLite()) {
                 #ifdef GEODE_IS_ANDROID64
                     static_assert(GEODE_COMP_GD_VERSION == 22074, "Unsupported GD version");
