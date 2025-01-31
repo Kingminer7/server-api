@@ -131,11 +131,13 @@ ServerAPI *ServerAPI::get() {
             #elif defined(GEODE_IS_ARM_MAC)
                 static_assert(GEODE_COMP_GD_VERSION == 22074, "Unsupported GD version");
                 instance->baseUrl = (char*)(geode::base::get() + 0x7749fb);
+                log::debug("encoded: {}, decoded: {}", (char*)(geode::base::get() + 0x774c73), ZipUtils::base64URLDecode((char*)(geode::base::get() + 0x774c73)));
                 instance->secondaryUrl = ZipUtils::base64URLDecode((char*)(geode::base::get() + 0x774c73));
                 // instance->secondaryUrl = (char*)(geode::base::get() + 0x488544);
             #elif defined(GEODE_IS_INTEL_MAC)
                 static_assert(GEODE_COMP_GD_VERSION == 22074, "Unsupported GD version");
                 instance->baseUrl = (char*)(geode::base::get() + 0x8516bf);
+                log::debug("encoded: {}, decoded: {}", (char*)(geode::base::get() + 0x851947), ZipUtils::base64URLDecode((char*)(geode::base::get() + 0x851947)));
                 instance->secondaryUrl = ZipUtils::base64URLDecode((char*)(geode::base::get() + 0x851947));
                 // instance->secondaryUrl = (char*)(geode::base::get() + 0x52D620);
             #elif defined(GEODE_IS_ANDROID64)
