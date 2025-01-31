@@ -148,7 +148,7 @@ ServerAPI *ServerAPI::get() {
             #endif
             }
             if(instance->baseUrl.size() > 36) instance->baseUrl = instance->baseUrl.substr(0, 35);
-            if(instance->baseUrl.size() > 46) instance->baseUrl = instance->baseUrl.substr(0, 45);
+            if(instance->secondaryUrl.size() > 46) instance->secondaryUrl = instance->secondaryUrl.substr(0, 45);
             return instance;
         };
 
