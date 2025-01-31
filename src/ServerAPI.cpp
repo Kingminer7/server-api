@@ -127,18 +127,15 @@ ServerAPI *ServerAPI::get() {
             #ifdef GEODE_IS_WINDOWS
                 static_assert(GEODE_COMP_GD_VERSION == 22074, "Unsupported GD version");
                 instance->baseUrl = (char*)(geode::base::get() + 0x53ea48);
-                log::debug("encoded: {}, decoded: {}", (char*)(geode::base::get() + 0x53ec80), ZipUtils::base64URLDecode((char*)(geode::base::get() + 0x53ec80)));
                 instance->secondaryUrl = ZipUtils::base64URLDecode((char*)(geode::base::get() + 0x53ec80));
             #elif defined(GEODE_IS_ARM_MAC)
                 static_assert(GEODE_COMP_GD_VERSION == 22074, "Unsupported GD version");
                 instance->baseUrl = (char*)(geode::base::get() + 0x7749fb);
-                log::debug("encoded: {}, decoded: {}", (char*)(geode::base::get() + 0x774c73), ZipUtils::base64URLDecode((char*)(geode::base::get() + 0x774c73)));
                 instance->secondaryUrl = ZipUtils::base64URLDecode((char*)(geode::base::get() + 0x774c73));
                 // instance->secondaryUrl = (char*)(geode::base::get() + 0x488544);
             #elif defined(GEODE_IS_INTEL_MAC)
                 static_assert(GEODE_COMP_GD_VERSION == 22074, "Unsupported GD version");
                 instance->baseUrl = (char*)(geode::base::get() + 0x8516bf);
-                log::debug("encoded: {}, decoded: {}", (char*)(geode::base::get() + 0x851947), ZipUtils::base64URLDecode((char*)(geode::base::get() + 0x851947)));
                 instance->secondaryUrl = ZipUtils::base64URLDecode((char*)(geode::base::get() + 0x851947));
                 // instance->secondaryUrl = (char*)(geode::base::get() + 0x52D620);
             #elif defined(GEODE_IS_ANDROID64)
@@ -155,7 +152,6 @@ ServerAPI *ServerAPI::get() {
             }
             if(instance->baseUrl.size() > 36) instance->baseUrl = instance->baseUrl.substr(0, 35);
             if(instance->secondaryUrl.size() > 35) instance->secondaryUrl = instance->secondaryUrl.substr(0, 34);
-            log::info("{},{}", instance->baseUrl, instance->secondaryUrl);
             return instance;
         };
 
