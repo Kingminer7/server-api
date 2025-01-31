@@ -1,6 +1,7 @@
 #include <Geode/Geode.hpp>
-#include "../include/ServerAPI.hpp"
+#include "ServerAPI.hpp"
 #include "../include/ServerAPIEvents.hpp"
+#include "Geode/cocos/support/zip_support/ZipUtils.h"
 #include "LiteUtils.hpp"
 
 using namespace ServerAPIEvents;
@@ -106,6 +107,10 @@ std::string ServerAPI::getBaseUrl() {
     return baseUrl;
 }
 
+std::string ServerAPI::getSecondaryUrl() {
+    return secondaryUrl;
+}
+
 ServerAPI *ServerAPI::get() {
             if (!instance) {
                 instance = new ServerAPI();
@@ -125,43 +130,48 @@ ServerAPI *ServerAPI::get() {
             #elif defined(GEODE_IS_ARM_MAC)
                 static_assert(GEODE_COMP_GD_VERSION == 22074, "Unsupported GD version");
                 instance->baseUrl = (char*)(geode::base::get() + 0x7749fb);
+                instance->secondaryUrl = (char*)(geode::base::get() + 0x488544);
             #elif defined(GEODE_IS_INTEL_MAC)
                 static_assert(GEODE_COMP_GD_VERSION == 22074, "Unsupported GD version");
                 instance->baseUrl = (char*)(geode::base::get() + 0x8516bf);
+                instance->secondaryUrl = (char*)(geode::base::get() + 0x52d620);
             #elif defined(GEODE_IS_ANDROID64)
                 static_assert(GEODE_COMP_GD_VERSION == 22074, "Unsupported GD version");
                 instance->baseUrl = (char*)(geode::base::get() + 0xEA2988);
+                instance->secondaryUrl = ZipUtils::base64URLDecode((char *)(geode::base::get() + 0xfa1748));
             #elif defined(GEODE_IS_ANDROID32)
                 static_assert(GEODE_COMP_GD_VERSION == 22074, "Unsupported GD version");
                 instance->baseUrl = (char*)(geode::base::get() + 0x952E9E);
+                instance->secondaryUrl = ZipUtils::base64URLDecode((char *)(geode::base::get() + 0x961e11));
             #else
                 static_assert(false, "Unsupported platform");
             #endif
             }
             if(instance->baseUrl.size() > 36) instance->baseUrl = instance->baseUrl.substr(0, 35);
+            if(instance->baseUrl.size() > 46) instance->baseUrl = instance->baseUrl.substr(0, 45);
             return instance;
         };
 
 $on_mod(Loaded) {
-    new EventListener<EventFilter<GetCurrentServerEvent>>(+[](GetCurrentServerEvent* e) {
+    new EventListener<EventFilter<events::GetCurrentServerEvent>>(+[](events::GetCurrentServerEvent* e) {
         e->m_url = ServerAPI::get()->getCurrentURL();
         e->m_prio = ServerAPI::get()->getCurrentPrio();
         e->m_id = ServerAPI::get()->getCurrentId();
         return ListenerResult::Stop;
     });
 
-    new EventListener<EventFilter<GetServerByIdEvent>>(+[](GetServerByIdEvent* e) {
+    new EventListener<EventFilter<events::GetServerByIdEvent>>(+[](events::GetServerByIdEvent* e) {
         e->m_url = ServerAPI::get()->getURLById(e->m_id);
         e->m_prio = ServerAPI::get()->getPrioById(e->m_id);
         return ListenerResult::Stop;
     });
 
-    new EventListener<EventFilter<RegisterServerEvent>>(+[](RegisterServerEvent* e) {
+    new EventListener<EventFilter<events::RegisterServerEvent>>(+[](events::RegisterServerEvent* e) {
         e->m_id = ServerAPI::get()->registerURL(e->m_url, e->m_priority);
         return ListenerResult::Stop;
     });
 
-    new EventListener<EventFilter<UpdateServerEvent>>(+[](UpdateServerEvent* e) {
+    new EventListener<EventFilter<events::UpdateServerEvent>>(+[](events::UpdateServerEvent* e) {
         if (e->m_url != "") {
             if (e->m_priority != 0) {
                 ServerAPI::get()->updateURLAndPrio(e->m_id, e->m_url, e->m_priority);
@@ -174,17 +184,22 @@ $on_mod(Loaded) {
         return ListenerResult::Stop;
     });
 
-    new EventListener<EventFilter<RemoveServerEvent>>(+[](RemoveServerEvent* e) {
+    new EventListener<EventFilter<events::RemoveServerEvent>>(+[](events::RemoveServerEvent* e) {
         ServerAPI::get()->removeURL(e->m_id);
         return ListenerResult::Stop;
     });
 
-    new EventListener<EventFilter<GetBaseUrlEvent>>(+[](GetBaseUrlEvent* e) {
+    new EventListener<EventFilter<events::GetBaseUrlEvent>>(+[](events::GetBaseUrlEvent* e) {
         e->m_url = ServerAPI::get()->getBaseUrl();
         return ListenerResult::Stop;
     });
 
-    new EventListener<EventFilter<GetRegisteredServersEvent>>(+[](GetRegisteredServersEvent* e) {
+    new EventListener<EventFilter<events::GetSecondaryUrlEvent>>(+[](events::GetSecondaryUrlEvent* e) {
+        e->m_url = ServerAPI::get()->getSecondaryUrl();
+        return ListenerResult::Stop;
+    });
+
+    new EventListener<EventFilter<events::GetRegisteredServersEvent>>(+[](events::GetRegisteredServersEvent* e) {
         e->m_servers = ServerAPI::get()->getAllServers();
         return ListenerResult::Stop;
     });
