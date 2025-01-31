@@ -66,7 +66,7 @@ protected:
     // DebugPopup::create()->show();
     std::string str = "";
     for (const auto &[uid, urlPrio] : ServerAPI::get()->getAllServers()) {
-      str += fmt::format("{}: {}\n", urlPrio.first, urlPrio.second);
+      str += fmt::format("{}: {}\n\n", urlPrio.first, urlPrio.second);
     }
     str += fmt::format("\n\nBase URL: {}\n\nSecondary URL: {}", ServerAPI::get()->getBaseUrl(), ServerAPI::get()->getSecondaryUrl());
     geode::MDPopup::create("Server API Debug", str, "Close")->show();
