@@ -131,10 +131,12 @@ ServerAPI *ServerAPI::get() {
             #elif defined(GEODE_IS_ARM_MAC)
                 static_assert(GEODE_COMP_GD_VERSION == 22074, "Unsupported GD version");
                 instance->baseUrl = (char*)(geode::base::get() + 0x7749fb);
+                instance->secondaryUrl = ZipUtils::base64URLDecode((char*)(geode::base::get() + 0x774c73));
                 // instance->secondaryUrl = (char*)(geode::base::get() + 0x488544);
             #elif defined(GEODE_IS_INTEL_MAC)
                 static_assert(GEODE_COMP_GD_VERSION == 22074, "Unsupported GD version");
                 instance->baseUrl = (char*)(geode::base::get() + 0x8516bf);
+                instance->secondaryUrl = ZipUtils::base64URLDecode((char*)(geode::base::get() + 0x851947));
                 // instance->secondaryUrl = (char*)(geode::base::get() + 0x52D620);
             #elif defined(GEODE_IS_ANDROID64)
                 static_assert(GEODE_COMP_GD_VERSION == 22074, "Unsupported GD version");
@@ -149,7 +151,7 @@ ServerAPI *ServerAPI::get() {
             #endif
             }
             if(instance->baseUrl.size() > 36) instance->baseUrl = instance->baseUrl.substr(0, 35);
-            if(instance->secondaryUrl.size() > 46) instance->secondaryUrl = instance->secondaryUrl.substr(0, 45);
+            if(instance->secondaryUrl.size() > 35) instance->secondaryUrl = instance->secondaryUrl.substr(0, 34);
             log::info("{},{}", instance->baseUrl, instance->secondaryUrl);
             return instance;
         };
