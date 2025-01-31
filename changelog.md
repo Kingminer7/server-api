@@ -1,4 +1,5 @@
-# 1.0.6
+# 2.0.0
+- Actually start using semver correctly
 - Remove old API
 - Fix gauntlet URL on patched games.
 # 1.0.5
