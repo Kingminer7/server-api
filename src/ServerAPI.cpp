@@ -127,8 +127,7 @@ ServerAPI *ServerAPI::get() {
             #ifdef GEODE_IS_WINDOWS
                 static_assert(GEODE_COMP_GD_VERSION == 22074, "Unsupported GD version");
                 instance->baseUrl = (char*)(geode::base::get() + 0x53ea48);
-                const char (&a)[80] = *reinterpret_cast<const char(*)[80]>(reinterpret_cast<std::uintptr_t>(geode::base::get() + 0x53ec80));
-                geode::log::debug("{}", a);
+                instance->secondaryUrl = ZipUtils::base64URLDecode((char*)(geode::base::get() + 0x53ec80));
             #elif defined(GEODE_IS_ARM_MAC)
                 static_assert(GEODE_COMP_GD_VERSION == 22074, "Unsupported GD version");
                 instance->baseUrl = (char*)(geode::base::get() + 0x7749fb);
@@ -140,7 +139,6 @@ ServerAPI *ServerAPI::get() {
             #elif defined(GEODE_IS_ANDROID64)
                 static_assert(GEODE_COMP_GD_VERSION == 22074, "Unsupported GD version");
                 instance->baseUrl = (char*)(geode::base::get() + 0xEA2988);
-                log::info("{}", std::string((char *)(geode::base::get() + 0xEA1748)));
                 instance->secondaryUrl = ZipUtils::base64URLDecode((char *)(geode::base::get() + 0xEA1748));
             #elif defined(GEODE_IS_ANDROID32)
                 static_assert(GEODE_COMP_GD_VERSION == 22074, "Unsupported GD version");
@@ -157,25 +155,25 @@ ServerAPI *ServerAPI::get() {
         };
 
 $on_mod(Loaded) {
-    new EventListener<EventFilter<events::GetCurrentServerEvent>>(+[](events::GetCurrentServerEvent* e) {
+    new EventListener<EventFilter<GetCurrentServerEvent>>(+[](GetCurrentServerEvent* e) {
         e->m_url = ServerAPI::get()->getCurrentURL();
         e->m_prio = ServerAPI::get()->getCurrentPrio();
         e->m_id = ServerAPI::get()->getCurrentId();
         return ListenerResult::Stop;
     });
 
-    new EventListener<EventFilter<events::GetServerByIdEvent>>(+[](events::GetServerByIdEvent* e) {
+    new EventListener<EventFilter<GetServerByIdEvent>>(+[](GetServerByIdEvent* e) {
         e->m_url = ServerAPI::get()->getURLById(e->m_id);
         e->m_prio = ServerAPI::get()->getPrioById(e->m_id);
         return ListenerResult::Stop;
     });
 
-    new EventListener<EventFilter<events::RegisterServerEvent>>(+[](events::RegisterServerEvent* e) {
+    new EventListener<EventFilter<RegisterServerEvent>>(+[](RegisterServerEvent* e) {
         e->m_id = ServerAPI::get()->registerURL(e->m_url, e->m_priority);
         return ListenerResult::Stop;
     });
 
-    new EventListener<EventFilter<events::UpdateServerEvent>>(+[](events::UpdateServerEvent* e) {
+    new EventListener<EventFilter<UpdateServerEvent>>(+[](UpdateServerEvent* e) {
         if (e->m_url != "") {
             if (e->m_priority != 0) {
                 ServerAPI::get()->updateURLAndPrio(e->m_id, e->m_url, e->m_priority);
@@ -188,22 +186,22 @@ $on_mod(Loaded) {
         return ListenerResult::Stop;
     });
 
-    new EventListener<EventFilter<events::RemoveServerEvent>>(+[](events::RemoveServerEvent* e) {
+    new EventListener<EventFilter<RemoveServerEvent>>(+[](RemoveServerEvent* e) {
         ServerAPI::get()->removeURL(e->m_id);
         return ListenerResult::Stop;
     });
 
-    new EventListener<EventFilter<events::GetBaseUrlEvent>>(+[](events::GetBaseUrlEvent* e) {
+    new EventListener<EventFilter<GetBaseUrlEvent>>(+[](GetBaseUrlEvent* e) {
         e->m_url = ServerAPI::get()->getBaseUrl();
         return ListenerResult::Stop;
     });
 
-    new EventListener<EventFilter<events::GetSecondaryUrlEvent>>(+[](events::GetSecondaryUrlEvent* e) {
+    new EventListener<EventFilter<GetSecondaryUrlEvent>>(+[](GetSecondaryUrlEvent* e) {
         e->m_url = ServerAPI::get()->getSecondaryUrl();
         return ListenerResult::Stop;
     });
 
-    new EventListener<EventFilter<events::GetRegisteredServersEvent>>(+[](events::GetRegisteredServersEvent* e) {
+    new EventListener<EventFilter<GetRegisteredServersEvent>>(+[](GetRegisteredServersEvent* e) {
         e->m_servers = ServerAPI::get()->getAllServers();
         return ListenerResult::Stop;
     });
