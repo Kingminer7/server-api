@@ -130,19 +130,20 @@ ServerAPI *ServerAPI::get() {
             #elif defined(GEODE_IS_ARM_MAC)
                 static_assert(GEODE_COMP_GD_VERSION == 22074, "Unsupported GD version");
                 instance->baseUrl = (char*)(geode::base::get() + 0x7749fb);
-                instance->secondaryUrl = (char*)(geode::base::get() + 0x488544);
+                // instance->secondaryUrl = (char*)(geode::base::get() + 0x488544);
             #elif defined(GEODE_IS_INTEL_MAC)
                 static_assert(GEODE_COMP_GD_VERSION == 22074, "Unsupported GD version");
                 instance->baseUrl = (char*)(geode::base::get() + 0x8516bf);
-                instance->secondaryUrl = (char*)(geode::base::get() + 0x52d620);
+                // instance->secondaryUrl = (char*)(geode::base::get() + 0x52D620);
             #elif defined(GEODE_IS_ANDROID64)
                 static_assert(GEODE_COMP_GD_VERSION == 22074, "Unsupported GD version");
                 instance->baseUrl = (char*)(geode::base::get() + 0xEA2988);
-                instance->secondaryUrl = ZipUtils::base64URLDecode((char *)(geode::base::get() + 0xfa1748));
+                log::info("{}", std::string((char *)(geode::base::get() + 0xEA1748)));
+                instance->secondaryUrl = ZipUtils::base64URLDecode((char *)(geode::base::get() + 0xEA1748));
             #elif defined(GEODE_IS_ANDROID32)
                 static_assert(GEODE_COMP_GD_VERSION == 22074, "Unsupported GD version");
                 instance->baseUrl = (char*)(geode::base::get() + 0x952E9E);
-                instance->secondaryUrl = ZipUtils::base64URLDecode((char *)(geode::base::get() + 0x961e11));
+                instance->secondaryUrl = ZipUtils::base64URLDecode((char *)(geode::base::get() + 0x951E11));
             #else
                 static_assert(false, "Unsupported platform");
             #endif
