@@ -1,3 +1,6 @@
+# 1.0.6
+- Remove old API
+- Fix gauntlet URL on patched games.
 # 1.0.5
 - Fix server automatically setting to RobTop's when on a url patched game
 # 1.0.4

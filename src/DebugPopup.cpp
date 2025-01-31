@@ -1,4 +1,4 @@
-#include "../include/ServerAPI.hpp"
+#include "ServerAPI.hpp"
 #include <Geode/loader/Mod.hpp>
 #include <Geode/loader/SettingV3.hpp>
 

@@ -33,6 +33,7 @@ class SERVER_API_DLL ServerAPI {
         void updatePrio(int id, int priority);
         void updateURL(int id, std::string url);
         std::string getBaseUrl();
+        std::string getSecondaryUrl();
         std::map<int, std::pair<std::string, int>> getAllServers();
         bool firstML = true;
 };
