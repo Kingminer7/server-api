@@ -127,6 +127,7 @@ ServerAPI *ServerAPI::get() {
             #ifdef GEODE_IS_WINDOWS
                 static_assert(GEODE_COMP_GD_VERSION == 22074, "Unsupported GD version");
                 instance->baseUrl = (char*)(geode::base::get() + 0x53ea48);
+                log::debug("encoded: {}, decoded: {}", (char*)(geode::base::get() + 0x53ec80), ZipUtils::base64URLDecode((char*)(geode::base::get() + 0x53ec80)));
                 instance->secondaryUrl = ZipUtils::base64URLDecode((char*)(geode::base::get() + 0x53ec80));
             #elif defined(GEODE_IS_ARM_MAC)
                 static_assert(GEODE_COMP_GD_VERSION == 22074, "Unsupported GD version");
