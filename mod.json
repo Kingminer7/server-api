@@ -13,6 +13,7 @@
   "api": {
     "include": ["include/*.hpp"]
   },
+  "early-load": true,
   "links": {
     "source": "https://github.com/kingminer7/server-api",
     "community": "https://discord.gg/Vj5Mcennph",
