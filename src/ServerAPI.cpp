@@ -146,6 +146,10 @@ ServerAPI *ServerAPI::get() {
                 static_assert(GEODE_COMP_GD_VERSION == 22074, "Unsupported GD version");
                 instance->baseUrl = (char*)(geode::base::get() + 0x952E9E);
                 instance->secondaryUrl = ZipUtils::base64URLDecode((char *)(geode::base::get() + 0x951E11));
+            #elif defined(GEODE_IS_IOS)
+                static_assert(GEODE_COMP_GD_VERSION == 22074, "Unsupported GD version");
+                instance->baseUrl = (char*)(geode::base::get() + 0x6AF51A);
+                instance->secondaryUrl = ZipUtils::base64URLDecode((char*)(geode::base::get() + 0x6af7a0));
             #else
                 static_assert(false, "Unsupported platform");
             #endif
