@@ -1,3 +1,5 @@
+# 2.0.1
+- iOS support
 # 2.0.0
 - Actually start using semver correctly
 - Remove old API
