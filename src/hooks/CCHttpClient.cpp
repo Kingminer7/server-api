@@ -9,7 +9,7 @@ class $modify(CCHttpClient) {
 		std::string url = req->getUrl();
 		auto newUrl = ServerAPI::get()->getCurrentURL();
 		if (ServerAPI::get()->getCurrentURL() != "NONE_REGISTERED") {
-			if(url.starts_with("https://www.newgrounds.com/audio/download/") && !fastGetSetting<"audio-fix", bool>()) {
+			if(url.starts_with("https://www.newgrounds.com/audio/download/") && !Mod::get()->getSettingValue<bool>("audio-fix")) {
 				req->setUrl(url.replace(0, 41, fmt::format("{}/music/", newUrl)).c_str());
 			}
 			if (url.starts_with(ServerAPI::get()->getBaseUrl())) {
