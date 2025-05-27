@@ -1,3 +1,5 @@
+# 2.0.2
+- Make the mod work on GD from the Amazon App Store
 # 2.0.1
 - iOS support
 # 2.0.0

@@ -39,3 +39,26 @@ class SERVER_API_DLL ServerAPI {
         std::map<int, std::pair<std::string, int>> getAllServers();
         bool isAmazon();
 };
+
+template<unsigned N>
+struct TemplateStr {
+    char buf[N + 1]{};
+
+    constexpr TemplateStr(char const* s) {
+        for (unsigned i = 0; i != N; ++i) buf[i] = s[i];
+    }
+
+    constexpr operator char const*() const { return buf; }
+};
+template<unsigned N> TemplateStr(char const (&)[N]) -> TemplateStr<N - 1>;
+
+
+template <TemplateStr setting, typename T>
+T fastGetSetting() {
+    static T value = geode::Mod::get()->getSettingValue<T>(setting);
+    geode::listenForSettingChanges<T>(setting, [](T v) {
+        value = v;
+    });
+
+    return value;
+}
