@@ -14,12 +14,14 @@
 class SERVER_API_DLL ServerAPI {
     private:
         // <id, <url, prio>>
-        int nextId = 0;
-        std::string baseUrl;
-        std::string secondaryUrl;
+        int m_nextId = 0;
+        std::string m_baseUrl;
+        std::string m_secondaryUrl;
+        bool m_amazon = false;
     protected: 
         static ServerAPI *instance;
-        std::map<int, std::pair<std::string, int>> overrides = {};
+        void init();
+        std::map<int, std::pair<std::string, int>> m_overrides = {};
 	public:
         static ServerAPI *get();
         std::string getCurrentURL();
@@ -35,5 +37,5 @@ class SERVER_API_DLL ServerAPI {
         std::string getBaseUrl();
         std::string getSecondaryUrl();
         std::map<int, std::pair<std::string, int>> getAllServers();
-        bool firstML = true;
+        bool isAmazon();
 };
