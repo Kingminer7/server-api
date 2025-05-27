@@ -55,11 +55,9 @@ jobs:
           bindings: geode-sdk/bindings
           bindings-ref: main
           combine: true
-          sdk: nightly
-          cli: nightly
           build-config: ${{ github.event.inputs.build_type != 'release' && 'RelWithDebInfo' || 'Release' }}
-          export-pdb: ${{ github.event.inputs.build_type != 'release' }}
-          export-symbols: ${{ github.event.inputs.build_type != 'release' }}
+          export-pdb: true
+          export-symbols: true
           target: ${{ matrix.config.target }}
 
   package:
@@ -89,9 +87,6 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           path: './artifacts/'
-
-      #- run: |
-      #    7z x ./artifacts/build-output.zip
 
       - name: Create Nightly Release
         uses: andelf/nightly-release@main
