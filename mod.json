@@ -1,5 +1,5 @@
 {
-  "geode": "4.6.0",
+  "geode": "4.6.1",
   "gd": {
     "win": "2.2074",
     "android": "2.2074",
@@ -8,12 +8,13 @@
   },
   "id": "km7dev.server_api",
   "name": "Server API",
-  "version": "v2.0.3",
+  "version": "v2.0.4",
   "developer": "km7dev",
   "description": "An API for using other GD servers",
   "api": {
     "include": ["include/*.hpp"]
   },
+  "tags": ["api"],
   "early-load": true,
   "links": {
     "source": "https://github.com/kingminer7/server-api",

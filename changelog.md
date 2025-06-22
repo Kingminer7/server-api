@@ -1,3 +1,5 @@
+# 2.0.4
+- Add API tag
 # 2.0.3
 - JIT-less iOS support
 # 2.0.2
