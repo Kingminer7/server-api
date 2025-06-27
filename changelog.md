@@ -1,3 +1,5 @@
+# 2.0.5
+- New Logo
 # 2.0.4
 - Add API tag
 # 2.0.3
