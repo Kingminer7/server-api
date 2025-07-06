@@ -12,6 +12,44 @@ using namespace geode::prelude;
 #define SERVER_API_DLL __attribute__((visibility("default")))
 #endif
 
+namespace ServerAPITrust {
+enum class TrustLevel {
+    Untrusted = 0, Trusted, HighlyTrusted
+};
+
+std::unordered_map<std::string, TrustLevel> trustedModsLUT = {
+    {"lblazen.gdps_hub", TrustLevel::HighlyTrusted},
+    {"km7dev.gdps-switcher", TrustLevel::HighlyTrusted}
+};
+
+TrustLevel trustLevelFor(std::string modID) {
+    if (trustedModsLUT.find(modID) == trustedModsLUT.end()) return TrustLevel::Untrusted;
+    return trustedModsLUT.at(modID);
+}
+
+TrustLevel trustLevelFor(Mod* mod) {
+    return trustLevelFor(mod->getID());
+}
+
+bool isHighlyTrusted(std::string modID) {
+    if (trustedModsLUT.find(modID) == trustedModsLUT.end()) return false;
+    return trustedModsLUT.at(modID) == TrustLevel::HighlyTrusted;
+}
+
+bool isHighlyTrusted(Mod* mod) {
+    return isHighlyTrusted(mod->getID());
+}
+
+bool isTrusted(std::string modID) {
+    if (trustedModsLUT.find(modID) == trustedModsLUT.end()) return false;
+    return trustedModsLUT.at(modID) >= TrustLevel::Trusted;
+}
+
+bool isTrusted(Mod* mod) {
+    return isTrusted(mod->getID());
+}
+} // namespace ServerAPITrust
+
 struct GetCurrentServerEvent : geode::Event {
   GetCurrentServerEvent() {}
 
