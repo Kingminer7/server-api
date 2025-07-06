@@ -23,8 +23,11 @@ std::unordered_map<std::string, TrustLevel> trustedModsLUT = {
 };
 
 TrustLevel trustLevelFor(std::string modID) {
-    if (trustedModsLUT.find(modID) == trustedModsLUT.end()) return TrustLevel::Untrusted;
-    return trustedModsLUT.at(modID);
+    auto it = trustedModsLUT.find(modID);
+    if (it == trustedModsLUT.end()) {
+        return TrustLevel::Untrusted;
+    }
+    return it->second;
 }
 
 TrustLevel trustLevelFor(Mod* mod) {
@@ -32,8 +35,11 @@ TrustLevel trustLevelFor(Mod* mod) {
 }
 
 bool isHighlyTrusted(std::string modID) {
-    if (trustedModsLUT.find(modID) == trustedModsLUT.end()) return false;
-    return trustedModsLUT.at(modID) == TrustLevel::HighlyTrusted;
+    auto it = trustedModsLUT.find(modID);
+    if (it == trustedModsLUT.end()) {
+        return false;
+    }
+    return it->second == TrustLevel::HighlyTrusted;
 }
 
 bool isHighlyTrusted(Mod* mod) {
@@ -41,8 +47,11 @@ bool isHighlyTrusted(Mod* mod) {
 }
 
 bool isTrusted(std::string modID) {
-    if (trustedModsLUT.find(modID) == trustedModsLUT.end()) return false;
-    return trustedModsLUT.at(modID) >= TrustLevel::Trusted;
+    auto it = trustedModsLUT.find(modID);
+    if (it == trustedModsLUT.end()) {
+        return false;
+    }
+    return it->second >= TrustLevel::Trusted;
 }
 
 bool isTrusted(Mod* mod) {
