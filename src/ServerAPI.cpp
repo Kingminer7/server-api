@@ -3,6 +3,55 @@
 #include "../include/ServerAPIEvents.hpp"
 #include "Geode/cocos/support/zip_support/ZipUtils.h"
 
+constexpr int REQUIRED_GD_VERSION = 22074;
+constexpr bool IS_SUPPORTED_PLATFORM = true;
+
+#ifdef GEODE_IS_ANDROID
+    bool evaluateAmazon() {
+        return !((GJMoreGamesLayer *volatile)nullptr)->getMoreGamesList()->count();
+    }
+    #ifdef GEODE_IS_ANDROID64
+        constexpr std::uintptr_t BASE_URL_OFFSET_AMAZON      = 0xea27f8;
+        constexpr std::uintptr_t BASE_URL_OFFSET             = 0xea2988;
+        constexpr std::uintptr_t SECONDARY_URL_OFFSET_AMAZON = 0xea15b8;
+        constexpr std::uintptr_t SECONDARY_URL_OFFSET        = 0xea1748;
+    #elif defined(GEODE_IS_ANDROID32)
+        constexpr std::uintptr_t BASE_URL_OFFSET_AMAZON      = 0x952cce;
+        constexpr std::uintptr_t BASE_URL_OFFSET             = 0x952e9e;
+        constexpr std::uintptr_t SECONDARY_URL_OFFSET_AMAZON = 0x861c41;
+        constexpr std::uintptr_t SECONDARY_URL_OFFSET        = 0x951e11;
+    #endif
+#else
+    bool evaluateAmazon() { return false; }
+#endif
+#ifdef GEODE_IS_WINDOWS
+    constexpr std::uintptr_t BASE_URL_OFFSET_AMAZON      = 0x0;
+    constexpr std::uintptr_t BASE_URL_OFFSET             = 0x53ea48;
+    constexpr std::uintptr_t SECONDARY_URL_OFFSET_AMAZON = 0x0;
+    constexpr std::uintptr_t SECONDARY_URL_OFFSET        = 0x53ec80;
+#elif defined(GEODE_IS_ARM_MAC)
+    constexpr std::uintptr_t BASE_URL_OFFSET_AMAZON      = 0x0;
+    constexpr std::uintptr_t BASE_URL_OFFSET             = 0x7749fb;
+    constexpr std::uintptr_t SECONDARY_URL_OFFSET_AMAZON = 0x0;
+    constexpr std::uintptr_t SECONDARY_URL_OFFSET        = 0x774c73;
+#elif defined(GEODE_IS_INTEL_MAC)
+    constexpr std::uintptr_t BASE_URL_OFFSET_AMAZON      = 0x0;
+    constexpr std::uintptr_t BASE_URL_OFFSET             = 0x8516bf;
+    constexpr std::uintptr_t SECONDARY_URL_OFFSET_AMAZON = 0x0;
+    constexpr std::uintptr_t SECONDARY_URL_OFFSET        = 0x851947;
+#elif defined(GEODE_IS_IOS)
+    constexpr std::uintptr_t BASE_URL_OFFSET_AMAZON      = 0x0;
+    constexpr std::uintptr_t BASE_URL_OFFSET             = 0x6af51a;
+    constexpr std::uintptr_t SECONDARY_URL_OFFSET_AMAZON = 0x0;
+    constexpr std::uintptr_t SECONDARY_URL_OFFSET        = 0x6af7a0;
+#else
+    constexpr std::uintptr_t BASE_URL_OFFSET_AMAZON      = 0x0;
+    constexpr std::uintptr_t BASE_URL_OFFSET             = 0x0;
+    constexpr std::uintptr_t SECONDARY_URL_OFFSET_AMAZON = 0x0;
+    constexpr std::uintptr_t SECONDARY_URL_OFFSET        = 0x0;
+    IS_SUPPORTED_PLATFORM = false;
+#endif
+
 using namespace ServerAPIEvents;
 using namespace geode::prelude;
 
@@ -111,38 +160,13 @@ std::string ServerAPI::getSecondaryUrl() {
 }
 
 void ServerAPI::init() {
-    #ifdef GEODE_IS_ANDROID
-        m_amazon = !((GJMoreGamesLayer *volatile)nullptr)->getMoreGamesList()->count();
-        #ifdef GEODE_IS_ANDROID64
-            static_assert(GEODE_COMP_GD_VERSION == 22074, "Unsupported GD version");
-            this->m_baseUrl = (char*)(geode::base::get() + (m_amazon ? 0xea27f8 : 0xea2988));
-            this->m_secondaryUrl = ZipUtils::base64URLDecode((char *)(geode::base::get() + (m_amazon ? 0xea15b8 : 0xea1748)));
-        #elif defined(GEODE_IS_ANDROID32)
-            static_assert(GEODE_COMP_GD_VERSION == 22074, "Unsupported GD version");
-            this->m_baseUrl = (char*)(geode::base::get() + (m_amazon ? 0x952cce : 0x952e9e));
-            this->m_secondaryUrl = ZipUtils::base64URLDecode((char *)(geode::base::get() + (m_amazon ? 0x861c41 : 0x951e11)));
-        #endif
-    #elif defined(GEODE_IS_WINDOWS)
-        static_assert(GEODE_COMP_GD_VERSION == 22074, "Unsupported GD version");
-        this->m_baseUrl = (char*)(geode::base::get() + 0x53ea48);
-        this->m_secondaryUrl = ZipUtils::base64URLDecode((char*)(geode::base::get() + 0x53ec80));
-    #elif defined(GEODE_IS_ARM_MAC)
-        static_assert(GEODE_COMP_GD_VERSION == 22074, "Unsupported GD version");
-        this->m_baseUrl = (char*)(geode::base::get() + 0x7749fb);
-        this->m_secondaryUrl = ZipUtils::base64URLDecode((char*)(geode::base::get() + 0x774c73));
-        // this->secondaryUrl = (char*)(geode::base::get() + 0x488544);
-    #elif defined(GEODE_IS_INTEL_MAC)
-        static_assert(GEODE_COMP_GD_VERSION == 22074, "Unsupported GD version");
-        this->m_baseUrl = (char*)(geode::base::get() + 0x8516bf);
-        this->m_secondaryUrl = ZipUtils::base64URLDecode((char*)(geode::base::get() + 0x851947));
-        // this->secondaryUrl = (char*)(geode::base::get() + 0x52D620);
-    #elif defined(GEODE_IS_IOS)
-        static_assert(GEODE_COMP_GD_VERSION == 22074, "Unsupported GD version");
-        this->m_baseUrl = (char*)(geode::base::get() + 0x6AF51A);
-        this->m_secondaryUrl = ZipUtils::base64URLDecode((char*)(geode::base::get() + 0x6af7a0));
-    #else
-        static_assert(false, "Unsupported platform");
-    #endif
+    m_amazon = evaluateAmazon();
+    static_assert(GEODE_COMP_GD_VERSION == REQUIRED_GD_VERSION, "Unsupported GD version");
+    static_assert(IS_SUPPORTED_PLATFORM, "Unsupported platform");
+
+    this->m_baseUrl = (char*)(geode::base::get() + (m_amazon ? BASE_URL_OFFSET_AMAZON : BASE_URL_OFFSET));
+    this->m_secondaryUrl = ZipUtils::base64URLDecode((char *)(geode::base::get() + (m_amazon ? SECONDARY_URL_OFFSET_AMAZON : SECONDARY_URL_OFFSET)));
+
     if(this->m_baseUrl.size() > 36) this->m_baseUrl = this->m_baseUrl.substr(0, 35);
     if(this->m_secondaryUrl.size() > 35) this->m_secondaryUrl = this->m_secondaryUrl.substr(0, 34);
 }
