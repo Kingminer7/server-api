@@ -1,4 +1,5 @@
-# 2.0.6
+# 2.1.0
+- Added doxygen style documentation comments to the ServerAPIEvents header
 - Internal code changes
 - Small performance improvements
 # 2.0.5
