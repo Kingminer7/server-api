@@ -1,3 +1,6 @@
+# 2.0.6
+- Internal code changes
+- Small performance improvements
 # 2.0.5
 - New Logo
 # 2.0.4

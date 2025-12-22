@@ -66,6 +66,7 @@ int ServerAPI::registerURL(std::string url, int priority) {
     // <id, <url, prio>>
     this->m_overrides[this->m_nextId] = std::pair(url, priority);
     this->m_nextId++;
+    evaluateCache();
     return this->m_nextId - 1;
 }
 
@@ -73,6 +74,7 @@ void ServerAPI::updateURLAndPrio(int id, std::string url, int priority) {
     if (!url.ends_with("/")) url = url + "/";
     // <id, <url, prio>>
     this->m_overrides[id] = std::pair(url, priority);
+    evaluateCache();
 }
 
 void ServerAPI::updateURL(int id, std::string url) {
@@ -80,12 +82,14 @@ void ServerAPI::updateURL(int id, std::string url) {
     // <id, <url, prio>>
     int priority = this->m_overrides[id].second;
     this->m_overrides[id] = std::pair(url, priority);
+    evaluateCache(); // TODO: Maybe cache should use references to the servers?
 }
 
 void ServerAPI::updatePrio(int id, int priority) {
     // <id, <url, prio>>
     std::string url = this->m_overrides[id].first;
     this->m_overrides[id] = std::pair(url, priority);
+    evaluateCache();
 }
 
 std::string ServerAPI::getURLById(int id) {
@@ -107,44 +111,15 @@ int ServerAPI::getPrioById(int id) {
 }
 
 std::string ServerAPI::getCurrentURL() {
-    std::pair<std::string, int> highestPrioUrl = std::make_pair("NONE_REGISTERED", INT_MIN);
-    
-    for (const auto& [id, urlPrio] : m_overrides) {
-        const auto& [url, prio] = urlPrio;
-        if (prio > highestPrioUrl.second) {
-            highestPrioUrl = urlPrio;
-        }
-    }
-    
-    return highestPrioUrl.first;
+    return m_cache.URL;
 }
 
 int ServerAPI::getCurrentPrio() {
-    std::pair<std::string, int> highestPrioUrl = std::make_pair("NONE_REGISTERED", INT_MIN);
-    
-    for (const auto& [id, urlPrio] : m_overrides) {
-        const auto& [url, prio] = urlPrio;
-        if (prio > highestPrioUrl.second) {
-            highestPrioUrl = urlPrio;
-        }
-    }
-    
-    return highestPrioUrl.second;
+    return m_cache.Priority;
 }
 
 int ServerAPI::getCurrentId() {
-    std::pair<std::string, int> highestPrioUrl = std::make_pair("NONE_REGISTERED", INT_MIN);
-    int highestPrioId = 0;
-    
-    for (const auto& [id, urlPrio] : m_overrides) {
-        const auto& [url, prio] = urlPrio;
-        if (prio > highestPrioUrl.second) {
-            highestPrioUrl = urlPrio;
-            highestPrioId = id;
-        }
-    }
-    
-    return highestPrioId;
+    return m_cache.ID;
 }
 
 void ServerAPI::removeURL(int id) {
@@ -170,9 +145,31 @@ void ServerAPI::init() {
 
     this->m_baseUrl = (char*)(geode::base::get() + (m_amazon ? BASE_URL_OFFSET_AMAZON : BASE_URL_OFFSET));
     this->m_secondaryUrl = ZipUtils::base64URLDecode((char *)(geode::base::get() + (m_amazon ? SECONDARY_URL_OFFSET_AMAZON : SECONDARY_URL_OFFSET)));
+    m_cache = {0, "NONE_REGISTERED", INT_MIN};
 
+    // DO NOT FUCKING TOUCH THIS!
+    // Kam wrote this forever ago and doesn't remember what it does.
+    // The commit message when these lines were added was literally just
+    // "gdps url support kinda." SO DONT FUCK WITH IT!!
     if(this->m_baseUrl.size() > 36) this->m_baseUrl = this->m_baseUrl.substr(0, 35);
     if(this->m_secondaryUrl.size() > 35) this->m_secondaryUrl = this->m_secondaryUrl.substr(0, 34);
+}
+
+void ServerAPI::evaluateCache() {
+    std::pair<std::string, int> highestServer = std::make_pair("NONE_REGISTERED", INT_MIN);
+    int highestServerId = 0;
+    
+    for (const auto& [id, server] : m_overrides) {
+        const auto& [url, prio] = server;
+        if (prio > highestServer.second) {
+            highestServerId = id;
+            highestServer = server;
+        }
+    }
+
+    m_cache.ID = highestServerId;
+    m_cache.URL = highestServer.first;
+    m_cache.Priority = highestServer.second;
 }
 
 ServerAPI *ServerAPI::get() {

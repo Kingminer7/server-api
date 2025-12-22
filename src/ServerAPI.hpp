@@ -13,6 +13,14 @@
 
 class SERVER_API_DLL ServerAPI {
     private:
+        // Putting our *CURRENT* server in a cache and returning it for getters.
+        // Setters will re-evaluate the cache.
+        struct ServerCache {
+            int ID;
+            std::string URL;
+            int Priority;
+        };
+        ServerCache m_cache;
         // <id, <url, prio>>
         int m_nextId = 0;
         std::string m_baseUrl;
@@ -21,6 +29,7 @@ class SERVER_API_DLL ServerAPI {
     protected: 
         static ServerAPI *instance;
         void init();
+        void evaluateCache();
         std::map<int, std::pair<std::string, int>> m_overrides = {};
 	public:
         static ServerAPI *get();
