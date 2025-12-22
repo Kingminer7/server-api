@@ -125,7 +125,7 @@ int ServerAPI::getCurrentId() {
 void ServerAPI::removeURL(int id) {
     this->m_overrides.erase(id);
     if (m_overrides.empty()) {
-        m_cache = ServerCache::None;
+        m_cache = ServerCache::none();
     }
 }
 
@@ -148,7 +148,7 @@ void ServerAPI::init() {
 
     this->m_baseUrl = (char*)(geode::base::get() + (m_amazon ? BASE_URL_OFFSET_AMAZON : BASE_URL_OFFSET));
     this->m_secondaryUrl = ZipUtils::base64URLDecode((char *)(geode::base::get() + (m_amazon ? SECONDARY_URL_OFFSET_AMAZON : SECONDARY_URL_OFFSET)));
-    m_cache = ServerCache::None;
+    m_cache = ServerCache::none();
 
     // DO NOT FUCKING TOUCH THIS!
     // Kam wrote this forever ago and doesn't remember what it does.

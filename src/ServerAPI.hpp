@@ -20,9 +20,8 @@ private:
         std::string URL;
         int Priority;
 
-        static const ServerCache None;
+        static const ServerCache none() { return {0, "NONE_REGISTERED", INT_MIN}; }
     };
-    const ServerCache ServerCache::None = {0, "NONE_REGISTERED", INT_MIN};
     ServerCache m_cache;
     // <id, <url, prio>>
     int m_nextId = 0;
