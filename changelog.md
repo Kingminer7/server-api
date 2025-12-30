@@ -1,3 +1,7 @@
+# 2.1.1
+- Fixed compiler error when including ServerAPIEvents without including Geode
+- Removed `using namespace geode::prelude;` in ServerAPIEvents header
+- Tweaks to avoid possible future namespace conflicts
 # 2.1.0
 - Added doxygen style documentation comments to the ServerAPIEvents header
 - Internal code changes
