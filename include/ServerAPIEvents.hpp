@@ -1,5 +1,6 @@
 #pragma once
 
+#include <Geode/Geode.hpp>
 using namespace geode::prelude;
 
 #ifdef GEODE_IS_WINDOWS

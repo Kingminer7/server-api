@@ -9,7 +9,11 @@ API to communicate with servers, allowing public and private server support.
 ## Usage (Developer)
 ### [Put this in your mod if you want an optional dependency.](https://github.com/Kingminer7/server-api/edit/main/include/ServerAPIEvents.hpp), or use suggested dependency if what I've been told is correct
 Servers are returned as a struct with 3 values: url, prio, and id.<br/>
-`server.url` is the actual server url, `server.priority` is the server priority, and `server.id` is the id used internally by Server API.<br/>
+
+- `server.url` is the actual server url
+- `server.priority` is the server priority. The server registered with the highest priority will be the one GD connects to for online interactions.
+- `server.id` is a handle to your server used to interact with Server API.<br/>
+
 ### Getting the server currently in use
 To get the currently used server, use `ServerAPIEvents::getCurrentServer()`. Whatever server has the highest priority is returned.<br/>
 Example of getting something from the servers, uses Geode's web api
@@ -52,7 +56,7 @@ class $modify(MenuLayer) {
 };
 ```
 ### Registering a server
-To register a server, it's simple. Just call `ServerAPIEvents::registerServer(url, priority)`. It returns an int, which is the id of the registered server. Store this if you plan to edit or remove your URL.</br>
+To register a server, it's simple. Just call `ServerAPIEvents::registerServer(url, priority)`. It returns an int, which is the id/handle of the registered server. Store this if you plan to edit or remove your URL.</br>
 Here's an example.
 ```c++
 #include <km7dev.server_api/include/ServerAPIEvents.hpp>
@@ -134,7 +138,8 @@ class ExampleClass {
 };
 ```
 ### Getting all servers
-If you want to have info about the various servers, use `ServerAPI::get()->getAllServers();`
+If you want to have info about the various servers, use `ServerAPI::get()->getAllServers();`<br/>
+This returns a `std::map<int, std::pair<std::string, int>>` which contains server registry data as (ID/Handle, (URL, Priority))
 ```c++
 #include <km7dev.server_api/include/ServerAPI.hpp>
 // or, if you dont want to require dep and have the header in your source
@@ -144,9 +149,16 @@ class ExampleClass {
     public: 
         void myFunc()
         {
-            auto servers = ServerAPIEvents::getRegisteredServers();
+            // <id/handle, <url, priority>>
+            std::map<int, std::pair<std::string, int>> servers = ServerAPIEvents::getRegisteredServers();
             
             // do something with the servers
         }
 };
 ```
+## Contributing
+This project is open source so feedback and controbutions are always welcome!
+### Reporting bugs
+Simply open an issue in the issues tab of the repository, describe the bug to the best of your ability, and we can take a crack at it!
+### Contributing code
+If you'd like to fix any bugs, add new features, or otherwise improve the project in any way, simply create a pull request! Help is always appreciated! Please take care not to make any changes that break existing code for users. This project doesn't have the best codebase in the world and could be made a lot better if it were rewritten from the ground up, but it will not be any time soon.
