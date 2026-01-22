@@ -3,23 +3,26 @@
 #include "../include/ServerAPIEvents.hpp"
 #include "Geode/cocos/support/zip_support/ZipUtils.h"
 
-constexpr int REQUIRED_GD_VERSION = 22074;
+constexpr int REQUIRED_GD_VERSION = 22081;
 
+// TODO UPDATE FOR 2.208 oh fuck me
+// Base URL: https://www.boomlings.com/database/getGJLevelLists.php
+// Secondary URL: aHR0cDovL3d3dy5ib29tbGluZ3MuY29tL2RhdGFiYXNlL2dldEdKTGV2ZWxzMjEucGhw
 #ifdef GEODE_IS_ANDROID
     constexpr bool isSupportedPlatform() { return true; }
     bool evaluateAmazon() {
         return !((GJMoreGamesLayer *volatile)nullptr)->getMoreGamesList()->count();
     }
     #ifdef GEODE_IS_ANDROID64
-        constexpr std::uintptr_t BASE_URL_OFFSET_AMAZON      = 0xea27f8;
-        constexpr std::uintptr_t BASE_URL_OFFSET             = 0xea2988;
-        constexpr std::uintptr_t SECONDARY_URL_OFFSET_AMAZON = 0xea15b8;
-        constexpr std::uintptr_t SECONDARY_URL_OFFSET        = 0xea1748;
+        constexpr std::uintptr_t BASE_URL_OFFSET_AMAZON      = 0xa55;
+        constexpr std::uintptr_t BASE_URL_OFFSET             = 0xa55;
+        constexpr std::uintptr_t SECONDARY_URL_OFFSET_AMAZON = 0xa55;
+        constexpr std::uintptr_t SECONDARY_URL_OFFSET        = 0xa55;
     #elif defined(GEODE_IS_ANDROID32)
-        constexpr std::uintptr_t BASE_URL_OFFSET_AMAZON      = 0x952cce;
-        constexpr std::uintptr_t BASE_URL_OFFSET             = 0x952e9e;
-        constexpr std::uintptr_t SECONDARY_URL_OFFSET_AMAZON = 0x861c41;
-        constexpr std::uintptr_t SECONDARY_URL_OFFSET        = 0x951e11;
+        constexpr std::uintptr_t BASE_URL_OFFSET_AMAZON      = 0xa55;
+        constexpr std::uintptr_t BASE_URL_OFFSET             = 0xa55;
+        constexpr std::uintptr_t SECONDARY_URL_OFFSET_AMAZON = 0xa55;
+        constexpr std::uintptr_t SECONDARY_URL_OFFSET        = 0xa55;
     #endif
 #else
     bool evaluateAmazon() { return false; }
@@ -27,39 +30,39 @@ constexpr int REQUIRED_GD_VERSION = 22074;
 #ifdef GEODE_IS_WINDOWS
     constexpr bool isSupportedPlatform() { return true; }
     constexpr std::uintptr_t BASE_URL_OFFSET_AMAZON      = 0x0;
-    constexpr std::uintptr_t BASE_URL_OFFSET             = 0x53ea48;
+    constexpr std::uintptr_t BASE_URL_OFFSET             = 0x558d78;
     constexpr std::uintptr_t SECONDARY_URL_OFFSET_AMAZON = 0x0;
-    constexpr std::uintptr_t SECONDARY_URL_OFFSET        = 0x53ec80;
+    constexpr std::uintptr_t SECONDARY_URL_OFFSET        = 0x558dc0;
 #elif defined(GEODE_IS_ARM_MAC)
     constexpr bool isSupportedPlatform() { return true; }
     constexpr std::uintptr_t BASE_URL_OFFSET_AMAZON      = 0x0;
-    constexpr std::uintptr_t BASE_URL_OFFSET             = 0x7749fb;
-    constexpr std::uintptr_t SECONDARY_URL_OFFSET_AMAZON = 0x0;
-    constexpr std::uintptr_t SECONDARY_URL_OFFSET        = 0x774c73;
+    constexpr std::uintptr_t BASE_URL_OFFSET             = 0x77d8d8;
+    constexpr std::uintptr_t SECONDARY_URL_OFFSET_AMAZON = 0xa55;
+    constexpr std::uintptr_t SECONDARY_URL_OFFSET        = 0x77d989;
 #elif defined(GEODE_IS_INTEL_MAC)
     constexpr bool isSupportedPlatform() { return true; }
     constexpr std::uintptr_t BASE_URL_OFFSET_AMAZON      = 0x0;
-    constexpr std::uintptr_t BASE_URL_OFFSET             = 0x8516bf;
+    constexpr std::uintptr_t BASE_URL_OFFSET             = 0x868fcf;
     constexpr std::uintptr_t SECONDARY_URL_OFFSET_AMAZON = 0x0;
-    constexpr std::uintptr_t SECONDARY_URL_OFFSET        = 0x851947;
+    constexpr std::uintptr_t SECONDARY_URL_OFFSET        = 0x869080;
 #elif defined(GEODE_IS_IOS)
     constexpr bool isSupportedPlatform() { return true; }
-    constexpr std::uintptr_t BASE_URL_OFFSET_AMAZON      = 0x0;
-    constexpr std::uintptr_t BASE_URL_OFFSET             = 0x6af51a;
-    constexpr std::uintptr_t SECONDARY_URL_OFFSET_AMAZON = 0x0;
-    constexpr std::uintptr_t SECONDARY_URL_OFFSET        = 0x6af7a0;
-#elif not defined(GEODE_IS_ANDROID)
+    constexpr std::uintptr_t BASE_URL_OFFSET_AMAZON      = 0xa55;
+    constexpr std::uintptr_t BASE_URL_OFFSET             = 0xa55;
+    constexpr std::uintptr_t SECONDARY_URL_OFFSET_AMAZON = 0xa55;
+    constexpr std::uintptr_t SECONDARY_URL_OFFSET        = 0xa55;
+#elif !defined(GEODE_IS_ANDROID)
     constexpr bool isSupportedPlatform() { return false; }
-    constexpr std::uintptr_t BASE_URL_OFFSET_AMAZON      = 0x0;
-    constexpr std::uintptr_t BASE_URL_OFFSET             = 0x0;
-    constexpr std::uintptr_t SECONDARY_URL_OFFSET_AMAZON = 0x0;
-    constexpr std::uintptr_t SECONDARY_URL_OFFSET        = 0x0;
+    constexpr std::uintptr_t BASE_URL_OFFSET_AMAZON      = 0xa55;
+    constexpr std::uintptr_t BASE_URL_OFFSET             = 0xa55;
+    constexpr std::uintptr_t SECONDARY_URL_OFFSET_AMAZON = 0xa55;
+    constexpr std::uintptr_t SECONDARY_URL_OFFSET        = 0xa55;
 #endif
 
 using namespace ServerAPIEvents;
 using namespace geode::prelude;
 
-ServerAPI * ServerAPI::instance = nullptr;
+ServerAPI* ServerAPI::instance = nullptr;
 
 int ServerAPI::registerURL(std::string url, int priority) {
     if (!url.ends_with("/")) url = url + "/";
@@ -150,10 +153,7 @@ void ServerAPI::init() {
     this->m_secondaryUrl = ZipUtils::base64URLDecode((char *)(geode::base::get() + (m_amazon ? SECONDARY_URL_OFFSET_AMAZON : SECONDARY_URL_OFFSET)));
     m_cache = ServerCache::none();
 
-    // DO NOT FUCKING TOUCH THIS!
-    // Kam wrote this forever ago and doesn't remember what it does.
-    // The commit message when these lines were added was literally just
-    // "gdps url support kinda." SO DONT FUCK WITH IT!!
+    // Trims endpoint off of URL.
     if(this->m_baseUrl.size() > 36) this->m_baseUrl = this->m_baseUrl.substr(0, 35);
     if(this->m_secondaryUrl.size() > 35) this->m_secondaryUrl = this->m_secondaryUrl.substr(0, 34);
 }
@@ -175,7 +175,7 @@ void ServerAPI::evaluateCache() {
     m_cache.Priority = highestServer.second;
 }
 
-ServerAPI *ServerAPI::get() {
+ServerAPI* ServerAPI::get() {
     if (!instance) {
         instance = new ServerAPI();
         instance->init();
