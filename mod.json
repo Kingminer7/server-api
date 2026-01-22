@@ -14,7 +14,7 @@
   "api": {
     "include": ["include/*.hpp"]
   },
-  "tags": ["developer"],
+  "tags": ["api", "developer"],
   "early-load": true,
   "links": {
     "source": "https://github.com/kingminer7/server-api",

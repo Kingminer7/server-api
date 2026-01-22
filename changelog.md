@@ -1,5 +1,6 @@
 # 2.1.2
 - Fix for 2.208(1)
+- Added developer tag
 # 2.1.1
 - Fixed compiler error when including ServerAPIEvents without including Geode
 - Removed `using namespace geode::prelude;` in ServerAPIEvents header
