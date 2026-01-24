@@ -48,5 +48,10 @@ public:
     std::string getBaseUrl();
     std::string getSecondaryUrl();
     std::map<int, std::pair<std::string, int>> getAllServers();
+
+    template <typename CFunc, typename... TArgs>
+    requires std::invocable<CFunc, ServerAPI*, TArgs...>
+    decltype(auto) doAndNotifyIfServerUpdate(CFunc&& func, TArgs&&... args, Mod* updater);
+
     bool isAmazon();
 };

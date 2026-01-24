@@ -90,6 +90,18 @@ bool isTrusted(::geode::Mod* mod) {
 }
 } // namespace ServerAPITrust
 
+/// @brief Inherits from event; Represents the server being updated to and by who
+struct ServerUpdatingEvent : ::geode::Event{    
+private:
+    const ::geode::Mod* updater;
+    const ::std::string& url;
+public:
+    ServerUpdatingEvent(Mod* updater, const std::string& url) : updater(updater), url(url) {};
+    const ::std::string& url() const { return url; }
+    const ::geode::Mod* updater() const { return updater; }
+    const ::geode::Mod* whoUpdatedTheFuckingServer() const { return updater; }
+};
+
 /// @brief Inherits from event; Represents server in use by ServerAPI
 struct GetCurrentServerEvent : ::geode::Event {
   GetCurrentServerEvent() {}

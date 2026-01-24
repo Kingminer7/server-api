@@ -1,5 +1,6 @@
-# 2.1.2
-- Fix for 2.208(1)
+# 2.2.0
+- Added `ServerUpdatingEvent`, a read-only Event which fires when the server updates; specifies what server is being switched to and by whom.
+- Fix for 2.2081
 - Added developer tag
 # 2.1.1
 - Fixed compiler error when including ServerAPIEvents without including Geode

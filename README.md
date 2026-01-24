@@ -156,6 +156,26 @@ class ExampleClass {
         }
 };
 ```
+### Dealing with unexpected server changes
+Some other mods may add a server and cause the server the game is using to switch unexpectedly. If that mod doesn't clean up after itself, bugs may occur.
+To remedy this, listen for a `ServerUpdatingEvent`, it contains info on who changed the server and what server is being switched to, you may use this to see if you need
+to do any protective measures.
+```c++
+class MyModsManager {
+    bool m_shouldSaveGameData;
+public:
+    void shouldSaveGameData(bool should) {
+        m_shouldSaveGameData = should;
+    }
+};
+
+$on_mod(Loaded) {
+    new EventListener<EventFilter<ServerUpdatingEvent>>(+[](ServerUpdatingEvent* e) {
+        bool trusted = (e->sender->getID() == "devitrust.mod-i-trust");
+        MyModsManager::get()->shouldSaveGameData(trust);
+    });
+}
+```
 ## Contributing
 This project is open source so feedback and controbutions are always welcome!
 ### Reporting bugs
