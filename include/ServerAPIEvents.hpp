@@ -42,7 +42,7 @@ enum class TrustLevel {
 /// @brief Gets the TrustLevel associated with a mod using its ID
 /// @param modID Mod's ID from its mod.json
 /// @return Its trurst level as a TrustLevel enum
-TrustLevel trustLevelFor(::std::string modID) {
+inline TrustLevel trustLevelFor(::std::string modID) {
     auto it = trustedModsLUT.find(modID);
     if (it == trustedModsLUT.end()) {
         return TrustLevel::Untrusted;
@@ -53,13 +53,13 @@ TrustLevel trustLevelFor(::std::string modID) {
 /// @brief Gets the TrustLevel associated with a mod
 /// @param mod Pointer to the mod
 /// @return Its trurst level as a TrustLevel enum
-TrustLevel trustLevelFor(::geode::Mod* mod) {
+inline TrustLevel trustLevelFor(::geode::Mod* mod) {
     return trustLevelFor(mod->getID());
 }
 
 /// @param modID Mod's ID from its mod.json
 /// @return True if the mod is HighlyTrusted
-bool isHighlyTrusted(::std::string modID) {
+inline bool isHighlyTrusted(::std::string modID) {
     auto it = trustedModsLUT.find(modID);
     if (it == trustedModsLUT.end()) {
         return false;
@@ -69,13 +69,13 @@ bool isHighlyTrusted(::std::string modID) {
 
 /// @param mod Pointer to the mod
 /// @return True if the mod is HighlyTrusted
-bool isHighlyTrusted(::geode::Mod* mod) {
+inline bool isHighlyTrusted(::geode::Mod* mod) {
     return isHighlyTrusted(mod->getID());
 }
 
 /// @param modID Mod's ID from its mod.json
 /// @return True if the mod is Trusted or HighlyTrusted
-bool isTrusted(::std::string modID) {
+inline bool isTrusted(::std::string modID) {
     auto it = trustedModsLUT.find(modID);
     if (it == trustedModsLUT.end()) {
         return false;
@@ -85,7 +85,7 @@ bool isTrusted(::std::string modID) {
 
 /// @param mod Pointer to the mod
 /// @return True if the mod is Trusted or HighlyTrusted
-bool isTrusted(::geode::Mod* mod) {
+inline bool isTrusted(::geode::Mod* mod) {
     return isTrusted(mod->getID());
 }
 } // namespace ServerAPITrust
@@ -96,9 +96,9 @@ private:
     const ::geode::Mod* updater;
     const ::std::string& url;
 public:
-    ServerUpdatingEvent(Mod* updater, const std::string& url) : updater(updater), url(url) {};
-    const ::std::string& url() const { return url; }
-    const ::geode::Mod* updater() const { return updater; }
+    ServerUpdatingEvent(::geode::Mod* updater, const std::string& url) : updater(updater), url(url) {};
+    const ::std::string& getUrl() const { return url; }
+    const ::geode::Mod* getUpdater() const { return updater; }
     const ::geode::Mod* whoUpdatedTheFuckingServer() const { return updater; }
 };
 

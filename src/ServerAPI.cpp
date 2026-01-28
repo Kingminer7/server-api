@@ -185,20 +185,33 @@ ServerAPI* ServerAPI::get() {
 
 template <typename CFunc, typename... TArgs>
 requires std::invocable<CFunc, ServerAPI*, TArgs...> // Must be method of ServerAPI
-decltype(auto) ServerAPI::doAndNotifyIfServerUpdate(CFunc&& func, TArgs&&... args, Mod* updater) {
+decltype(auto) ServerAPI::doAndNotifyIfServerUpdate(CFunc&& func, Mod* updater, TArgs&&... args) {
     int oldID = m_cache.ID;
-    decltype(auto) ret = std::invoke(
-        std::forward<CFunc>(func),
-        this
-        std::forward<TArgs>(args)...
-    );
 
-    // Server has updated
-    if (oldID != m_cache.ID) {
-        ServerUpdatingEvent(updater, m_cache.URL).post();
+    auto notifyIfNeeded = [this, oldID, updater] {
+        // Server has updated
+        if (oldID != m_cache.ID) {
+            ServerUpdatingEvent(updater, m_cache.URL).post();
+        }
+    };
+
+    using TRet = std::invoke_result_t<CFunc, ServerAPI*, TArgs...>;
+    if constexpr (std::is_void_v<TRet>) {
+        std::invoke(
+            std::forward<CFunc>(func),
+            this,
+            std::forward<TArgs>(args)...
+        );
+        notifyIfNeeded();
+    } else {
+        TRet ret = std::invoke(
+            std::forward<CFunc>(func),
+            this,
+            std::forward<TArgs>(args)...
+        );
+        notifyIfNeeded();
+        return ret;
     }
-
-    return ret;
 }
 
 bool ServerAPI::isAmazon() {
@@ -221,7 +234,7 @@ $on_mod(Loaded) {
 
     new EventListener<EventFilter<RegisterServerEvent>>(+[](RegisterServerEvent* e) {
         //e->m_id = ServerAPI::get()->registerURL(e->m_url, e->m_priority);
-        e->m_id = ServerAPI::get()->doAndNotifyIfServerUpdate(&ServerAPI::registerURL, e->m_url, e->m_priority, e->sender);
+        e->m_id = ServerAPI::get()->doAndNotifyIfServerUpdate(&ServerAPI::registerURL, e->sender, e->m_url, e->m_priority);
         return ListenerResult::Stop;
     });
 
@@ -229,21 +242,21 @@ $on_mod(Loaded) {
         if (e->m_url != "") {
             if (e->m_priority != 0) {
                 //ServerAPI::get()->updateURLAndPrio(e->m_id, e->m_url, e->m_priority);
-                ServerAPI::get()->doAndNotifyIfServerUpdate(&ServerAPI::updateURLAndPrio, e->m_id, e->m_url, e->m_priority, e->sender);
+                ServerAPI::get()->doAndNotifyIfServerUpdate(&ServerAPI::updateURLAndPrio, e->sender, e->m_id, e->m_url, e->m_priority);
             } else {
                 //ServerAPI::get()->updateURL(e->m_id, e->m_url);
-                ServerAPI::get()->doAndNotifyIfServerUpdate(&ServerAPI::updateURLAndPrio, e->m_id, e->m_url, e->sender);
+                ServerAPI::get()->doAndNotifyIfServerUpdate(&ServerAPI::updateURL, e->sender, e->m_id, e->m_url);
             }
         } else {
             //ServerAPI::get()->updatePrio(e->m_id, e->m_priority);
-            ServerAPI::get()->doAndNotifyIfServerUpdate(&ServerAPI::updatePrio, e->m_id, e->m_priority, e->sender);
+            ServerAPI::get()->doAndNotifyIfServerUpdate(&ServerAPI::updatePrio, e->sender, e->m_id, e->m_priority);
         }
         return ListenerResult::Stop;
     });
 
     new EventListener<EventFilter<RemoveServerEvent>>(+[](RemoveServerEvent* e) {
         //ServerAPI::get()->removeURL(e->m_id);
-        ServerAPI::get()->doAndNotifyIfServerUpdate(&ServerAPI::removeURL, e->m_id, e->sender);
+        ServerAPI::get()->doAndNotifyIfServerUpdate(&ServerAPI::removeURL, e->sender, e->m_id);
         return ListenerResult::Stop;
     });
 
