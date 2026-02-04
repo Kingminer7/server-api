@@ -185,13 +185,14 @@ ServerAPI* ServerAPI::get() {
 
 template <typename CFunc, typename... TArgs>
 requires std::invocable<CFunc, ServerAPI*, TArgs...> // Must be method of ServerAPI
-decltype(auto) ServerAPI::doAndNotifyIfServerUpdate(CFunc&& func, Mod* updater, TArgs&&... args) {
+decltype(auto) ServerAPI::doAndNotifyIfServerUpdate(CFunc&& func, TArgs&&... args) {
     int oldID = m_cache.ID;
 
-    auto notifyIfNeeded = [this, oldID, updater] {
+    auto notifyIfNeeded = [this, oldID] {
         // Server has updated
         if (oldID != m_cache.ID) {
-            ServerUpdatingEvent(updater, m_cache.URL).post();
+            ServerUpdatingEventData event(::geode::Mod::get(), m_cache.URL);
+            ServerUpdatingEvent().send(&event);
         }
     };
 
@@ -219,59 +220,59 @@ bool ServerAPI::isAmazon() {
 }
 
 $on_mod(Loaded) {
-    new EventListener<EventFilter<GetCurrentServerEvent>>(+[](GetCurrentServerEvent* e) {
+    GetCurrentServerEvent().listen([](GetCurrentServerEventData* e) {
         e->m_url = ServerAPI::get()->getCurrentURL();
         e->m_prio = ServerAPI::get()->getCurrentPrio();
         e->m_id = ServerAPI::get()->getCurrentId();
         return ListenerResult::Stop;
-    });
+    }).leak();
 
-    new EventListener<EventFilter<GetServerByIdEvent>>(+[](GetServerByIdEvent* e) {
+    GetServerByIdEvent().listen([](GetServerByIdEventData* e) {
         e->m_url = ServerAPI::get()->getURLById(e->m_id);
         e->m_prio = ServerAPI::get()->getPrioById(e->m_id);
         return ListenerResult::Stop;
-    });
+    }).leak();
 
-    new EventListener<EventFilter<RegisterServerEvent>>(+[](RegisterServerEvent* e) {
+    RegisterServerEvent().listen([](RegisterServerEventData* e) {
         //e->m_id = ServerAPI::get()->registerURL(e->m_url, e->m_priority);
-        e->m_id = ServerAPI::get()->doAndNotifyIfServerUpdate(&ServerAPI::registerURL, e->sender, e->m_url, e->m_priority);
+        e->m_id = ServerAPI::get()->doAndNotifyIfServerUpdate(&ServerAPI::registerURL, e->m_url, e->m_priority);
         return ListenerResult::Stop;
-    });
+    }).leak();
 
-    new EventListener<EventFilter<UpdateServerEvent>>(+[](UpdateServerEvent* e) {
+    UpdateServerEvent().listen([](UpdateServerEventData* e) {
         if (e->m_url != "") {
             if (e->m_priority != 0) {
                 //ServerAPI::get()->updateURLAndPrio(e->m_id, e->m_url, e->m_priority);
-                ServerAPI::get()->doAndNotifyIfServerUpdate(&ServerAPI::updateURLAndPrio, e->sender, e->m_id, e->m_url, e->m_priority);
+                ServerAPI::get()->doAndNotifyIfServerUpdate(&ServerAPI::updateURLAndPrio, e->m_id, e->m_url, e->m_priority);
             } else {
                 //ServerAPI::get()->updateURL(e->m_id, e->m_url);
-                ServerAPI::get()->doAndNotifyIfServerUpdate(&ServerAPI::updateURL, e->sender, e->m_id, e->m_url);
+                ServerAPI::get()->doAndNotifyIfServerUpdate(&ServerAPI::updateURL, e->m_id, e->m_url);
             }
         } else {
             //ServerAPI::get()->updatePrio(e->m_id, e->m_priority);
-            ServerAPI::get()->doAndNotifyIfServerUpdate(&ServerAPI::updatePrio, e->sender, e->m_id, e->m_priority);
+            ServerAPI::get()->doAndNotifyIfServerUpdate(&ServerAPI::updatePrio, e->m_id, e->m_priority);
         }
         return ListenerResult::Stop;
-    });
+    }).leak();
 
-    new EventListener<EventFilter<RemoveServerEvent>>(+[](RemoveServerEvent* e) {
+    RemoveServerEvent().listen([](RemoveServerEventData* e) {
         //ServerAPI::get()->removeURL(e->m_id);
-        ServerAPI::get()->doAndNotifyIfServerUpdate(&ServerAPI::removeURL, e->sender, e->m_id);
+        ServerAPI::get()->doAndNotifyIfServerUpdate(&ServerAPI::removeURL, e->m_id);
         return ListenerResult::Stop;
-    });
+    }).leak();
 
-    new EventListener<EventFilter<GetBaseUrlEvent>>(+[](GetBaseUrlEvent* e) {
+    GetBaseUrlEvent().listen([](GetBaseUrlEventData* e) {
         e->m_url = ServerAPI::get()->getBaseUrl();
         return ListenerResult::Stop;
-    });
+    }).leak();
 
-    new EventListener<EventFilter<GetSecondaryUrlEvent>>(+[](GetSecondaryUrlEvent* e) {
+    GetSecondaryUrlEvent().listen([](GetSecondaryUrlEventData* e) {
         e->m_url = ServerAPI::get()->getSecondaryUrl();
         return ListenerResult::Stop;
-    });
+    }).leak();
 
-    new EventListener<EventFilter<GetRegisteredServersEvent>>(+[](GetRegisteredServersEvent* e) {
+    GetRegisteredServersEvent().listen([](GetRegisteredServersEventData* e) {
         e->m_servers = ServerAPI::get()->getAllServers();
         return ListenerResult::Stop;
-    });
+    }).leak();
 }

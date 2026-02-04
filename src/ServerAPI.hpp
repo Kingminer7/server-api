@@ -51,7 +51,7 @@ public:
 
     template <typename CFunc, typename... TArgs>
     requires std::invocable<CFunc, ServerAPI*, TArgs...>
-    decltype(auto) doAndNotifyIfServerUpdate(CFunc&& func, geode::Mod* updater, TArgs&&... args);
+    decltype(auto) doAndNotifyIfServerUpdate(CFunc&& func, TArgs&&... args);
 
     bool isAmazon();
 };
