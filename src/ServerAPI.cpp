@@ -2,62 +2,15 @@
 #include "ServerAPI.hpp"
 #include "../include/ServerAPIEvents.hpp"
 #include "Geode/cocos/support/zip_support/ZipUtils.h"
+#include "PlatformOffsets.hpp"
+#include "VoidCast.hpp"
 
 constexpr int REQUIRED_GD_VERSION = 22081;
 
-// TODO UPDATE FOR 2.208 oh fuck me
-// Base URL: https://www.boomlings.com/database/getGJLevelLists.php
-// Secondary URL: aHR0cDovL3d3dy5ib29tbGluZ3MuY29tL2RhdGFiYXNlL2dldEdKTGV2ZWxzMjEucGhw
-#ifdef GEODE_IS_ANDROID
-    constexpr bool isSupportedPlatform() { return true; }
-    bool evaluateAmazon() {
-        return !((GJMoreGamesLayer *volatile)nullptr)->getMoreGamesList()->count();
-    }
-    #ifdef GEODE_IS_ANDROID64
-        constexpr std::uintptr_t BASE_URL_OFFSET_AMAZON      = 0xa55;
-        constexpr std::uintptr_t BASE_URL_OFFSET             = 0xa55;
-        constexpr std::uintptr_t SECONDARY_URL_OFFSET_AMAZON = 0xa55;
-        constexpr std::uintptr_t SECONDARY_URL_OFFSET        = 0xa55;
-    #elif defined(GEODE_IS_ANDROID32)
-        constexpr std::uintptr_t BASE_URL_OFFSET_AMAZON      = 0xa55;
-        constexpr std::uintptr_t BASE_URL_OFFSET             = 0xa55;
-        constexpr std::uintptr_t SECONDARY_URL_OFFSET_AMAZON = 0xa55;
-        constexpr std::uintptr_t SECONDARY_URL_OFFSET        = 0xa55;
-    #endif
-#else
-    bool evaluateAmazon() { return false; }
-#endif
-#ifdef GEODE_IS_WINDOWS
-    constexpr bool isSupportedPlatform() { return true; }
-    constexpr std::uintptr_t BASE_URL_OFFSET_AMAZON      = 0x0;
-    constexpr std::uintptr_t BASE_URL_OFFSET             = 0x558d78;
-    constexpr std::uintptr_t SECONDARY_URL_OFFSET_AMAZON = 0x0;
-    constexpr std::uintptr_t SECONDARY_URL_OFFSET        = 0x558dc0;
-#elif defined(GEODE_IS_ARM_MAC)
-    constexpr bool isSupportedPlatform() { return true; }
-    constexpr std::uintptr_t BASE_URL_OFFSET_AMAZON      = 0x0;
-    constexpr std::uintptr_t BASE_URL_OFFSET             = 0x77d8d8;
-    constexpr std::uintptr_t SECONDARY_URL_OFFSET_AMAZON = 0x0;
-    constexpr std::uintptr_t SECONDARY_URL_OFFSET        = 0x77d989;
-#elif defined(GEODE_IS_INTEL_MAC)
-    constexpr bool isSupportedPlatform() { return true; }
-    constexpr std::uintptr_t BASE_URL_OFFSET_AMAZON      = 0x0;
-    constexpr std::uintptr_t BASE_URL_OFFSET             = 0x868fcf;
-    constexpr std::uintptr_t SECONDARY_URL_OFFSET_AMAZON = 0x0;
-    constexpr std::uintptr_t SECONDARY_URL_OFFSET        = 0x869080;
-#elif defined(GEODE_IS_IOS)
-    constexpr bool isSupportedPlatform() { return true; }
-    constexpr std::uintptr_t BASE_URL_OFFSET_AMAZON      = 0xa55;
-    constexpr std::uintptr_t BASE_URL_OFFSET             = 0xa55;
-    constexpr std::uintptr_t SECONDARY_URL_OFFSET_AMAZON = 0xa55;
-    constexpr std::uintptr_t SECONDARY_URL_OFFSET        = 0xa55;
-#elif !defined(GEODE_IS_ANDROID)
-    constexpr bool isSupportedPlatform() { return false; }
-    constexpr std::uintptr_t BASE_URL_OFFSET_AMAZON      = 0xa55;
-    constexpr std::uintptr_t BASE_URL_OFFSET             = 0xa55;
-    constexpr std::uintptr_t SECONDARY_URL_OFFSET_AMAZON = 0xa55;
-    constexpr std::uintptr_t SECONDARY_URL_OFFSET        = 0xa55;
-#endif
+const std::unordered_map<std::string, ServerAPITrust::TrustLevel> ServerAPI::m_trustedModsLUT = {
+    {"lblazen.gdps_hub", ServerAPITrust::TrustLevel::HighlyTrusted},
+    {"km7dev.gdps-switcher", ServerAPITrust::TrustLevel::HighlyTrusted} // Putting my own mod here because I have an ego and fuck you.
+};
 
 using namespace ServerAPIEvents;
 using namespace geode::prelude;
@@ -125,6 +78,10 @@ int ServerAPI::getCurrentId() {
     return m_cache.ID;
 }
 
+const std::unordered_map<std::string, ServerAPITrust::TrustLevel>& ServerAPI::getTrustedMods() {
+    return m_trustedModsLUT;
+}
+
 void ServerAPI::removeURL(int id) {
     this->m_overrides.erase(id);
     if (m_overrides.empty()) {
@@ -188,30 +145,22 @@ requires std::invocable<CFunc, ServerAPI*, TArgs...> // Must be method of Server
 decltype(auto) ServerAPI::doAndNotifyIfServerUpdate(CFunc&& func, Mod* updater, TArgs&&... args) {
     int oldID = m_cache.ID;
 
-    auto notifyIfNeeded = [this, oldID, updater] {
-        // Server has updated
-        if (oldID != m_cache.ID) {
-            ServerUpdatingEvent(updater, m_cache.URL).post();
-        }
-    };
+    // Void is an incomplete type, so we have to hack our way around it
+    using TRet = VoidCastT<std::invoke_result_t<CFunc, ServerAPI*, TArgs...>>;
+    using TCastBack = std::invoke_result_t<CFunc, ServerAPI*, TArgs...>;
+    TRet ret = safeInvoke(
+        std::forward<CFunc>(func),
+        this,
+        std::forward<TArgs>(args)...
+    );
 
-    using TRet = std::invoke_result_t<CFunc, ServerAPI*, TArgs...>;
-    if constexpr (std::is_void_v<TRet>) {
-        std::invoke(
-            std::forward<CFunc>(func),
-            this,
-            std::forward<TArgs>(args)...
-        );
-        notifyIfNeeded();
-    } else {
-        TRet ret = std::invoke(
-            std::forward<CFunc>(func),
-            this,
-            std::forward<TArgs>(args)...
-        );
-        notifyIfNeeded();
-        return ret;
+    // Server has updated
+    if (oldID != m_cache.ID) {
+        ServerUpdatingEvent(updater, m_cache.URL).post();
     }
+
+    // Cast back to void if original result type is void
+    return static_cast<TCastBack>(ret);
 }
 
 bool ServerAPI::isAmazon() {
@@ -272,6 +221,11 @@ $on_mod(Loaded) {
 
     new EventListener<EventFilter<GetRegisteredServersEvent>>(+[](GetRegisteredServersEvent* e) {
         e->m_servers = ServerAPI::get()->getAllServers();
+        return ListenerResult::Stop;
+    });
+
+    new EventListener<EventFilter<GetTrustedModsEvent>>(+[](GetTrustedModsEvent* e) {
+        e->trustedMods = ServerAPI::get()->getTrustedMods();
         return ListenerResult::Stop;
     });
 }

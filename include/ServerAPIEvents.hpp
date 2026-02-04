@@ -21,77 +21,15 @@
 #define SERVER_API_DLL __attribute__((visibility("default")))
 #endif
 
-namespace ServerAPITrust {
-/// @brief Enum representing how trusted a Mod is to clean up after itself.
-///
-/// ServerAPI switches servers on a dime without warning other mods which
-/// may affect crucial systems relying on the server GD is connected to
-/// staying the same. While one mod may switch servers while preventing
-/// GD from saving player save data to disk, another may not, so this
-/// enum represents how trusted a mod is to use ServerAPI safely.
-enum class TrustLevel {
-    Untrusted = 0, Trusted, HighlyTrusted
+namespace ServerAPITrust { enum class TrustLevel; }
+/// @brief Inherits from event; Represents mods ServerAPI trusts to be safe
+struct GetTrustedModsEvent : ::geode::Event {
+    GetTrustedModsEvent() {}
+    ::std::unordered_map<::std::string, ::ServerAPITrust::TrustLevel> trustedMods;
 };
-
-/// @brief Lookup Table of trusted mods, you may change this in your copy of this header.
-::std::unordered_map<::std::string, TrustLevel> trustedModsLUT = {
-    {"lblazen.gdps_hub", TrustLevel::HighlyTrusted},
-    {"km7dev.gdps-switcher", TrustLevel::HighlyTrusted}
-};
-
-/// @brief Gets the TrustLevel associated with a mod using its ID
-/// @param modID Mod's ID from its mod.json
-/// @return Its trurst level as a TrustLevel enum
-inline TrustLevel trustLevelFor(::std::string modID) {
-    auto it = trustedModsLUT.find(modID);
-    if (it == trustedModsLUT.end()) {
-        return TrustLevel::Untrusted;
-    }
-    return it->second;
-}
-
-/// @brief Gets the TrustLevel associated with a mod
-/// @param mod Pointer to the mod
-/// @return Its trurst level as a TrustLevel enum
-inline TrustLevel trustLevelFor(::geode::Mod* mod) {
-    return trustLevelFor(mod->getID());
-}
-
-/// @param modID Mod's ID from its mod.json
-/// @return True if the mod is HighlyTrusted
-inline bool isHighlyTrusted(::std::string modID) {
-    auto it = trustedModsLUT.find(modID);
-    if (it == trustedModsLUT.end()) {
-        return false;
-    }
-    return it->second == TrustLevel::HighlyTrusted;
-}
-
-/// @param mod Pointer to the mod
-/// @return True if the mod is HighlyTrusted
-inline bool isHighlyTrusted(::geode::Mod* mod) {
-    return isHighlyTrusted(mod->getID());
-}
-
-/// @param modID Mod's ID from its mod.json
-/// @return True if the mod is Trusted or HighlyTrusted
-inline bool isTrusted(::std::string modID) {
-    auto it = trustedModsLUT.find(modID);
-    if (it == trustedModsLUT.end()) {
-        return false;
-    }
-    return it->second >= TrustLevel::Trusted;
-}
-
-/// @param mod Pointer to the mod
-/// @return True if the mod is Trusted or HighlyTrusted
-inline bool isTrusted(::geode::Mod* mod) {
-    return isTrusted(mod->getID());
-}
-} // namespace ServerAPITrust
 
 /// @brief Inherits from event; Represents the server being updated to and by who
-struct ServerUpdatingEvent : ::geode::Event{    
+struct ServerUpdatingEvent : ::geode::Event {    
 private:
     const ::geode::Mod* updater;
     const ::std::string& url;
@@ -279,3 +217,72 @@ inline ::std::map<int, ::std::pair<::std::string, int>> getRegisteredServers() {
   return event.m_servers;
 }
 } // namespace ServerAPIEvents
+
+namespace ServerAPITrust {
+/// @brief Enum representing how trusted a Mod is to clean up after itself.
+///
+/// ServerAPI switches servers on a dime without warning other mods which
+/// may affect crucial systems relying on the server GD is connected to
+/// staying the same. While one mod may switch servers while preventing
+/// GD from saving player save data to disk, another may not, so this
+/// enum represents how trusted a mod is to use ServerAPI safely.
+enum class TrustLevel {
+    Untrusted = 0, Trusted, HighlyTrusted
+};
+
+/// @brief Gets the TrustLevel associated with a mod using its ID
+/// @param modID Mod's ID from its mod.json
+/// @return Its trurst level as a TrustLevel enum
+inline TrustLevel trustLevelFor(::std::string modID) {
+    auto ev = GetTrustedModsEvent();
+    ev.post();
+    auto it = ev.trustedMods.find(modID);
+    if (it == ev.trustedMods.end()) {
+        return TrustLevel::Untrusted;
+    }
+    return it->second;
+}
+
+/// @brief Gets the TrustLevel associated with a mod
+/// @param mod Pointer to the mod
+/// @return Its trurst level as a TrustLevel enum
+inline TrustLevel trustLevelFor(::geode::Mod* mod) {
+    return trustLevelFor(mod->getID());
+}
+
+/// @param modID Mod's ID from its mod.json
+/// @return True if the mod is HighlyTrusted
+inline bool isHighlyTrusted(::std::string modID) {
+    auto ev = GetTrustedModsEvent();
+    ev.post();
+    auto it = ev.trustedMods.find(modID);
+    if (it == ev.trustedMods.end()) {
+        return false;
+    }
+    return it->second == TrustLevel::HighlyTrusted;
+}
+
+/// @param mod Pointer to the mod
+/// @return True if the mod is HighlyTrusted
+inline bool isHighlyTrusted(::geode::Mod* mod) {
+    return isHighlyTrusted(mod->getID());
+}
+
+/// @param modID Mod's ID from its mod.json
+/// @return True if the mod is Trusted or HighlyTrusted
+inline bool isTrusted(::std::string modID) {
+    auto ev = GetTrustedModsEvent();
+    ev.post();
+    auto it = ev.trustedMods.find(modID);
+    if (it == ev.trustedMods.end()) {
+        return false;
+    }
+    return it->second >= TrustLevel::Trusted;
+}
+
+/// @param mod Pointer to the mod
+/// @return True if the mod is Trusted or HighlyTrusted
+inline bool isTrusted(::geode::Mod* mod) {
+    return isTrusted(mod->getID());
+}
+} // namespace ServerAPITrust
