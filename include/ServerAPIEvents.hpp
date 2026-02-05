@@ -21,46 +21,67 @@
 #define SERVER_API_DLL __attribute__((visibility("default")))
 #endif
 
+struct BaseEventData {
+    ::geode::Mod* sender = ::geode::Mod::get();
+};
+
 namespace ServerAPITrust { enum class TrustLevel; }
-/// @brief Inherits from event; Represents mods ServerAPI trusts to be safe
-struct GetTrustedModsEvent : ::geode::Event {
-    GetTrustedModsEvent() {}
+/// @brief Represents mods ServerAPI trusts to be safe
+struct GetTrustedModsEventData : public BaseEventData {
+    GetTrustedModsEventData() {}
     ::std::unordered_map<::std::string, ::ServerAPITrust::TrustLevel> trustedMods;
 };
 
-/// @brief Inherits from event; Represents the server being updated to and by who
-struct ServerUpdatingEvent : ::geode::Event {    
+/// @brief Inerhits from event; Represents mods ServerAPI trusts to be safe
+struct GetTrustedModsEvent : ::geode::Event<GetTrustedModsEvent, bool(GetTrustedModsEventData*)> {
+    using Event::Event;
+};
+
+/// @brief Represents the server being updated to and by who
+struct ServerUpdatingEventData : public BaseEventData {    
 private:
     const ::geode::Mod* updater;
     const ::std::string& url;
 public:
-    ServerUpdatingEvent(::geode::Mod* updater, const std::string& url) : updater(updater), url(url) {};
+    ServerUpdatingEventData(::geode::Mod* updater, const std::string& url) : updater(updater), url(url) {};
     const ::std::string& getUrl() const { return url; }
     const ::geode::Mod* getUpdater() const { return updater; }
     const ::geode::Mod* whoUpdatedTheFuckingServer() const { return updater; }
 };
 
-/// @brief Inherits from event; Represents server in use by ServerAPI
-struct GetCurrentServerEvent : ::geode::Event {
-  GetCurrentServerEvent() {}
+struct ServerUpdatingEvent : ::geode::Event<ServerUpdatingEvent, bool(ServerUpdatingEventData*)> {
+  using Event::Event;
+};
+
+/// @brief Represents server in use by ServerAPI
+struct GetCurrentServerEventData : public BaseEventData {
+  GetCurrentServerEventData() {}
 
   int m_id = 0;
   ::std::string m_url = "";
   int m_prio = 0;
 };
 
-/// @brief Inherits from event; Represents server info acquired from its ID
-struct GetServerByIdEvent : ::geode::Event {
-  GetServerByIdEvent(int id) : m_id(::std::move(id)) {}
+struct GetCurrentServerEvent : ::geode::Event<GetCurrentServerEvent, bool(GetCurrentServerEventData*)> {
+  using Event::Event;
+};
+
+/// @brief Represents server info acquired from its ID
+struct GetServerByIdEventData {
+  GetServerByIdEventData(int id) : m_id(::std::move(id)) {}
 
   int m_id = 0;
   ::std::string m_url = "";
   int m_prio = 0;
 };
 
-/// @brief Inherits from event; Will register a server with a URL and a priority.
-struct RegisterServerEvent : ::geode::Event {
-  RegisterServerEvent(::std::string url, int priority)
+struct GetServerByIdEvent : ::geode::Event<GetServerByIdEvent, bool(GetServerByIdEventData*)> {
+  using Event::Event;
+};
+
+/// @brief Will register a server with a URL and a priority.
+struct RegisterServerEventData : public BaseEventData {
+  RegisterServerEventData(::std::string url, int priority)
       : m_url(::std::move(url)), m_priority(::std::move(priority)) {}
 
   int m_id;
@@ -68,14 +89,18 @@ struct RegisterServerEvent : ::geode::Event {
   int m_priority = 0;
 };
 
-/// @brief Inherits from event; Will update a server's information; requires server's ID
-struct UpdateServerEvent : ::geode::Event {
-  UpdateServerEvent(int id, ::std::string url, int priority)
+struct RegisterServerEvent : ::geode::Event<RegisterServerEvent, bool(RegisterServerEventData*)> {
+  using Event::Event;
+};
+
+/// @brief Will update a server's information; requires server's ID
+struct UpdateServerEventData : public BaseEventData {
+  UpdateServerEventData(int id, ::std::string url, int priority)
       : m_id(::std::move(id)), m_url(::std::move(url)),
         m_priority(::std::move(priority)) {}
-  UpdateServerEvent(int id, ::std::string url)
+  UpdateServerEventData(int id, ::std::string url)
       : m_id(::std::move(id)), m_url(::std::move(url)) {}
-  UpdateServerEvent(int id, int priority)
+  UpdateServerEventData(int id, int priority)
       : m_id(::std::move(id)), m_priority(::std::move(priority)) {}
 
   int m_id = 0;
@@ -83,34 +108,54 @@ struct UpdateServerEvent : ::geode::Event {
   int m_priority = 0;
 };
 
-/// @brief Inherits from event; Will remove a server from the registry; requires server's ID
-struct RemoveServerEvent : ::geode::Event {
-  RemoveServerEvent(int id) : m_id(::std::move(id)) {}
+struct UpdateServerEvent : ::geode::Event<UpdateServerEvent, bool(UpdateServerEventData*)> {
+  using Event::Event;
+};
+
+/// @brief Will remove a server from the registry; requires server's ID
+struct RemoveServerEventData : public BaseEventData {
+  RemoveServerEventData(int id) : m_id(::std::move(id)) {}
 
   int m_id = 0;
 };
 
-/// @brief Inherits from event; Represents base (https) URL for built-in servers (boomlings.com on vanilla GD)
-struct GetBaseUrlEvent : ::geode::Event {
-  GetBaseUrlEvent() {}
+struct RemoveServerEvent : ::geode::Event<RemoveServerEvent, bool(RemoveServerEventData*)> {
+  using Event::Event;
+};
+
+/// @brief Represents base (https) URL for built-in servers (boomlings.com on vanilla GD)
+struct GetBaseUrlEventData : public BaseEventData {
+  GetBaseUrlEventData() {}
 
   ::std::string m_url = "";
 };
 
-/// @brief Inherits from event; Represents secondary (http) URL for built-in servers (boomlings.com on vanilla GD)
-struct GetSecondaryUrlEvent : ::geode::Event {
-  GetSecondaryUrlEvent() {}
+struct GetBaseUrlEvent : ::geode::Event<GetBaseUrlEvent, bool(GetBaseUrlEventData*)> {
+  using Event::Event;
+};
+
+/// @brief Represents secondary (http) URL for built-in servers (boomlings.com on vanilla GD)
+struct GetSecondaryUrlEventData {
+  GetSecondaryUrlEventData() {}
 
   ::std::string m_url = "";
 };
 
-/// @brief Inherits from event; Represents entire server info registry
+struct GetSecondaryUrlEvent : ::geode::Event<GetSecondaryUrlEvent, bool(GetSecondaryUrlEventData*)> {
+  using Event::Event;
+};
+
+/// @brief Represents entire server info registry
 ///
 /// Server registry is a map of ints (IDs) to a pair of string and int (URL and priority)
-struct GetRegisteredServersEvent : ::geode::Event {
-  GetRegisteredServersEvent() {}
+struct GetRegisteredServersEventData : public BaseEventData {
+  GetRegisteredServersEventData() {}
 
   ::std::map<int, ::std::pair<::std::string, int>> m_servers = {};
+};
+
+struct GetRegisteredServersEvent : ::geode::Event<GetRegisteredServersEvent, bool(GetRegisteredServersEventData*)> {
+  using Event::Event;
 };
 
 // thx prevter for the help
@@ -130,16 +175,16 @@ struct Server {
 /// @brief Gets copy of the server currently in use by ServerAPI
 /// @return Server struct representing server currently in use by ServerAPI
 inline Server getCurrentServer() {
-  auto event = GetCurrentServerEvent();
-  event.post();
+  auto event = GetCurrentServerEventData();
+  GetCurrentServerEvent().send(&event);
   return {event.m_id, event.m_url, event.m_prio};
 }
 
 /// @brief Gets copy of server information from its ID
 /// @return Server struct representing the server with the specified ID
 inline Server getServerById(int id) {
-  auto event = GetServerByIdEvent(id);
-  event.post();
+  auto event = GetServerByIdEventData(id);
+  GetServerByIdEvent().send(&event);
   return {event.m_id, event.m_url, event.m_prio};
 }
 
@@ -148,17 +193,16 @@ inline Server getServerById(int id) {
 /// @param priority Its priority with respect to other servers competing for GD to connect to
 /// @return Server struct representing the newly registered server
 inline Server registerServer(::std::string url, int priority = 0) {
-  auto event = RegisterServerEvent(url, priority);
-  event.post();
+  auto event = RegisterServerEventData(url, priority);
+  RegisterServerEvent().send(&event);
   return {event.m_id, event.m_url, event.m_priority};
 }
 
 /// @brief Updates an existing server
 /// @param server The information to update the server with, the ID being a handle to the already existing server
 inline void updateServer(Server server) {
-  auto event =
-      UpdateServerEvent(server.id, server.url, server.priority);
-  event.post();
+  auto event = UpdateServerEventData(server.id, server.url, server.priority);
+  UpdateServerEvent().send(&event);
 }
 
 /// @brief Updates an existing server
@@ -166,54 +210,54 @@ inline void updateServer(Server server) {
 /// @param url The new url for the server to use
 /// @param priority The new priority for ServerAPI
 inline void updateServer(int id, ::std::string url, int priority) {
-  auto event = UpdateServerEvent(id, url, priority);
-  event.post();
+  auto event = UpdateServerEventData(id, url, priority);
+  UpdateServerEvent().send(&event);
 }
 
 /// @brief Updates an existing server without updating its priority
 /// @param id Handle to an already existing server
 /// @param url The new url for the server to use
 inline void updateServer(int id, ::std::string url) {
-  auto event = UpdateServerEvent(id, url);
-  event.post();
+  auto event = UpdateServerEventData(id, url);
+  UpdateServerEvent().send(&event);
 }
 
 /// @brief Updates an existing server without updating its URL
 /// @param id Handle to an already existing server
 /// @param priority The new priority for ServerAPI
 inline void updateServer(int id, int priority) {
-  auto event = UpdateServerEvent(id, priority);
-  event.post();
+  auto event = UpdateServerEventData(id, priority);
+  UpdateServerEvent().send(&event);
 }
 
 /// @brief Removes a server from the registry
 /// @param id Handle to the server to remove
 inline void removeServer(int id) {
-  auto event = RemoveServerEvent(id);
-  event.post();
+  auto event = RemoveServerEventData(id);
+  RemoveServerEvent().send(&event);
 }
 
 /// @brief Gets the base (https) URL for built-in servers
 /// @return Base (https) URL for built-in servers (boomlings.com on vanilla GD)
 inline ::std::string getBaseUrl() {
-  auto event = GetBaseUrlEvent();
-  event.post();
+  auto event = GetBaseUrlEventData();
+  GetBaseUrlEvent().send(&event);
   return event.m_url;
 }
 
 /// @brief Gets the secondary (http) URL for built-in servers
 /// @return Secondary (http) URL for built-in servers (boomlings.com on vanilla GD)
 inline ::std::string getSecondaryUrl() {
-  auto event = GetSecondaryUrlEvent();
-  event.post();
+  auto event = GetSecondaryUrlEventData();
+  GetSecondaryUrlEvent().send(&event);
   return event.m_url;
 }
 
 /// @brief Gets a copy the entire registry of servers
 /// @return Map of int (ID) and pair of string (URL) and int (Priority)
 inline ::std::map<int, ::std::pair<::std::string, int>> getRegisteredServers() {
-  auto event = GetRegisteredServersEvent();
-  event.post();
+  auto event = GetRegisteredServersEventData();
+  GetRegisteredServersEvent().send(&event);
   return event.m_servers;
 }
 } // namespace ServerAPIEvents
@@ -235,9 +279,10 @@ enum class TrustLevel {
 /// @return Its trurst level as a TrustLevel enum
 inline TrustLevel trustLevelFor(::std::string modID) {
     auto ev = GetTrustedModsEvent();
-    ev.post();
-    auto it = ev.trustedMods.find(modID);
-    if (it == ev.trustedMods.end()) {
+    auto data = GetTrustedModsEventData();
+    ev.send(&data);
+    auto it = data.trustedMods.find(modID);
+    if (it == data.trustedMods.end()) {
         return TrustLevel::Untrusted;
     }
     return it->second;
@@ -254,9 +299,10 @@ inline TrustLevel trustLevelFor(::geode::Mod* mod) {
 /// @return True if the mod is HighlyTrusted
 inline bool isHighlyTrusted(::std::string modID) {
     auto ev = GetTrustedModsEvent();
-    ev.post();
-    auto it = ev.trustedMods.find(modID);
-    if (it == ev.trustedMods.end()) {
+    auto data = GetTrustedModsEventData();
+    ev.send(&data);
+    auto it = data.trustedMods.find(modID);
+    if (it == data.trustedMods.end()) {
         return false;
     }
     return it->second == TrustLevel::HighlyTrusted;
@@ -272,9 +318,10 @@ inline bool isHighlyTrusted(::geode::Mod* mod) {
 /// @return True if the mod is Trusted or HighlyTrusted
 inline bool isTrusted(::std::string modID) {
     auto ev = GetTrustedModsEvent();
-    ev.post();
-    auto it = ev.trustedMods.find(modID);
-    if (it == ev.trustedMods.end()) {
+    auto data = GetTrustedModsEventData();
+    ev.send(&data);
+    auto it = data.trustedMods.find(modID);
+    if (it == data.trustedMods.end()) {
         return false;
     }
     return it->second >= TrustLevel::Trusted;

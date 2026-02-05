@@ -170,10 +170,11 @@ public:
 };
 
 $on_mod(Loaded) {
-    new EventListener<EventFilter<ServerUpdatingEvent>>(+[](ServerUpdatingEvent* e) {
-        bool trusted = (e->updater()->getID() == "devitrust.mod-i-trust");
-        MyModsManager::get()->shouldSaveGameData(trust);
-    });
+    ServerUpdatingEvent().listen([](ServerUpdatingEventData* e) {
+        bool trusted = (e->getUpdater()->getID() == "devitrust.mod-i-trust");
+        MyModsManager::get()->shouldSaveGameData(trusted);
+        return ListenerResult::Propagate;
+    }).leak();
 }
 ```
 ## Contributing

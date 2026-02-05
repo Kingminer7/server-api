@@ -1,5 +1,6 @@
-# 2.2.0
-- Added `ServerUpdatingEvent`, a read-only Event which fires when the server updates; specifies what server is being switched to and by whom.
+# 3.0.0
+- Updated to Geode v5, new event system
+- Added `ServerUpdatingEvent`, a read-only Event which fires when the server updates; specifies what server is being switched to and by whom
 - Fixed linker errors in `ServerAPIEvents.hpp`
 - Fix for 2.2081
 - Added developer tag
