@@ -34,7 +34,7 @@ enum class TrustLevel {
 };
 
 /// @brief Lookup Table of trusted mods, you may change this in your copy of this header.
-::std::unordered_map<::std::string, TrustLevel> trustedModsLUT = {
+static ::std::unordered_map<::std::string, TrustLevel> trustedModsLUT = {
     {"lblazen.gdps_hub", TrustLevel::HighlyTrusted},
     {"km7dev.gdps-switcher", TrustLevel::HighlyTrusted}
 };
