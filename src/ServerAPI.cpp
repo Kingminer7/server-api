@@ -20,31 +20,38 @@ ServerAPI* ServerAPI::instance = nullptr;
 int ServerAPI::registerURL(std::string url, int priority) {
     if (!url.ends_with("/")) url = url + "/";
     // <id, <url, prio>>
-    this->m_overrides[this->m_nextId] = std::pair(url, priority);
+    this->m_overrides[this->m_nextId] = std::pair(std::move(url), priority);
     this->m_nextId++;
     evaluateCache();
     return this->m_nextId - 1;
 }
 
 void ServerAPI::updateURLAndPrio(int id, std::string url, int priority) {
+    if (!m_overrides.contains(id)) {
+        log::error("Attempted to update priority of server ({}) which does not exist", id);
+        return;
+    }
     if (!url.ends_with("/")) url = url + "/";
-    // <id, <url, prio>>
-    this->m_overrides[id] = std::pair(url, priority);
+    this->m_overrides[id] = std::pair(std::move(url), priority);
     evaluateCache();
 }
 
 void ServerAPI::updateURL(int id, std::string url) {
+    if (!m_overrides.contains(id)) {
+        log::error("Attempted to update priority of server ({}) which does not exist", id);
+        return;
+    }
     if (!url.ends_with("/")) url = url + "/";
-    // <id, <url, prio>>
-    int priority = this->m_overrides[id].second;
-    this->m_overrides[id] = std::pair(url, priority);
+    m_overrides[id].first = std::move(url);
     evaluateCache(); // TODO: Maybe cache should use references to the servers?
 }
 
 void ServerAPI::updatePrio(int id, int priority) {
-    // <id, <url, prio>>
-    std::string url = this->m_overrides[id].first;
-    this->m_overrides[id] = std::pair(url, priority);
+    if (!m_overrides.contains(id)) {
+        log::error("Attempted to update priority of server ({}) which does not exist", id);
+        return;
+    }
+    m_overrides[id].second = priority;
     evaluateCache();
 }
 
