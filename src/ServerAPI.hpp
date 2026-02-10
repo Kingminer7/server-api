@@ -30,7 +30,7 @@ private:
     std::string m_baseUrl;
     std::string m_secondaryUrl;
     bool m_amazon = false;
-    static const std::unordered_map<std::string, ServerAPITrust::TrustLevel> m_trustedModsLUT;
+    static const geode::utils::StringMap<ServerAPITrust::TrustLevel> m_trustedModsLUT;
 protected: 
     static ServerAPI *instance;
     void init();
@@ -51,7 +51,7 @@ public:
     std::string getBaseUrl();
     std::string getSecondaryUrl();
     std::map<int, std::pair<std::string, int>> getAllServers();
-    const std::unordered_map<std::string, ServerAPITrust::TrustLevel>& getTrustedMods();
+    const geode::utils::StringMap<ServerAPITrust::TrustLevel>& getTrustedMods();
 
     template <typename CFunc, typename... TArgs>
     requires std::invocable<CFunc, ServerAPI*, TArgs...>
