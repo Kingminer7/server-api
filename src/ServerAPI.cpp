@@ -1,3 +1,4 @@
+#define GEODE_DEFINE_EVENT_EXPORTS
 #include <Geode/Geode.hpp>
 #include "ServerAPI.hpp"
 #include "../include/ServerAPIEvents.hpp"
@@ -5,46 +6,44 @@
 #include "PlatformOffsets.hpp"
 #include "VoidCast.hpp"
 
+using namespace ServerAPIEvents;
+using namespace geode::prelude;
+
 constexpr int REQUIRED_GD_VERSION = 22081;
 
-const std::unordered_map<std::string, ServerAPITrust::TrustLevel> ServerAPI::m_trustedModsLUT = {
+const StringMap<ServerAPITrust::TrustLevel> ServerAPI::m_trustedModsLUT = {
     {"lblazen.gdps_hub", ServerAPITrust::TrustLevel::HighlyTrusted},
     {"km7dev.gdps-switcher", ServerAPITrust::TrustLevel::HighlyTrusted} // Putting my own mod here because I have an ego and fuck you.
 };
 
-using namespace ServerAPIEvents;
-using namespace geode::prelude;
-
 ServerAPI* ServerAPI::instance = nullptr;
 
 int ServerAPI::registerURL(std::string url, int priority) {
-    if (!url.ends_with("/")) url = url + "/";
+    if (!url.ends_with("/")) url += "/";
     // <id, <url, prio>>
-    this->m_overrides[this->m_nextId] = std::pair(url, priority);
+    this->m_overrides[this->m_nextId] = std::pair(std::move(url), priority);
     this->m_nextId++;
     evaluateCache();
     return this->m_nextId - 1;
 }
 
 void ServerAPI::updateURLAndPrio(int id, std::string url, int priority) {
-    if (!url.ends_with("/")) url = url + "/";
+    if (!url.ends_with("/")) url += "/";
     // <id, <url, prio>>
-    this->m_overrides[id] = std::pair(url, priority);
+    this->m_overrides[id] = std::pair(std::move(url), priority);
     evaluateCache();
 }
 
 void ServerAPI::updateURL(int id, std::string url) {
-    if (!url.ends_with("/")) url = url + "/";
+    if (!url.ends_with("/")) url += "/";
     // <id, <url, prio>>
-    int priority = this->m_overrides[id].second;
-    this->m_overrides[id] = std::pair(url, priority);
+    this->m_overrides[id].first = std::move(url);
     evaluateCache(); // TODO: Maybe cache should use references to the servers?
 }
 
 void ServerAPI::updatePrio(int id, int priority) {
     // <id, <url, prio>>
-    std::string url = this->m_overrides[id].first;
-    this->m_overrides[id] = std::pair(url, priority);
+    this->m_overrides[id].second = priority;
     evaluateCache();
 }
 
@@ -78,7 +77,7 @@ int ServerAPI::getCurrentId() {
     return m_cache.ID;
 }
 
-const std::unordered_map<std::string, ServerAPITrust::TrustLevel>& ServerAPI::getTrustedMods() {
+const StringMap<ServerAPITrust::TrustLevel>& ServerAPI::getTrustedMods() {
     return m_trustedModsLUT;
 }
 
@@ -156,8 +155,7 @@ decltype(auto) ServerAPI::doAndNotifyIfServerUpdate(CFunc&& func, Mod* updater, 
 
     // Server has updated
     if (oldID != m_cache.ID) {
-        ServerUpdatingEventData event(updater, m_cache.URL);
-        ServerUpdatingEvent().send(&event);
+        ServerUpdatingEvent().send(updater, m_cache.URL);
     }
 
     // Cast back to void if original result type is void
@@ -168,65 +166,59 @@ bool ServerAPI::isAmazon() {
     return m_amazon;
 }
 
-$on_mod(Loaded) {
-    GetCurrentServerEvent().listen([](GetCurrentServerEventData* e) {
-        e->m_url = ServerAPI::get()->getCurrentURL();
-        e->m_prio = ServerAPI::get()->getCurrentPrio();
-        e->m_id = ServerAPI::get()->getCurrentId();
-        return ListenerResult::Stop;
-    }).leak();
+Server ServerAPIEvents::getCurrentServer() {
+    return {
+        .id = ServerAPI::get()->getCurrentId(),
+        .url = ServerAPI::get()->getCurrentURL(),
+        .priority = ServerAPI::get()->getCurrentPrio()
+    };
+}
 
-    GetServerByIdEvent().listen([](GetServerByIdEventData* e) {
-        e->m_url = ServerAPI::get()->getURLById(e->m_id);
-        e->m_prio = ServerAPI::get()->getPrioById(e->m_id);
-        return ListenerResult::Stop;
-    }).leak();
+Server ServerAPIEvents::getServerById(int id) {
+    return {
+        .id = id,
+        .url = ServerAPI::get()->getURLById(id),
+        .priority = ServerAPI::get()->getPrioById(id)
+    };
+}
 
-    RegisterServerEvent().listen([](RegisterServerEventData* e) {
-        //e->m_id = ServerAPI::get()->registerURL(e->m_url, e->m_priority);
-        e->m_id = ServerAPI::get()->doAndNotifyIfServerUpdate(&ServerAPI::registerURL, e->sender, e->m_url, e->m_priority);
-        return ListenerResult::Stop;
-    }).leak();
+Server ServerAPIEvents::registerServer(std::string url, int priority, Mod* sender) {
+    int id = ServerAPI::get()->doAndNotifyIfServerUpdate(&ServerAPI::registerURL, sender, url, priority);
+    return {
+        .id = id,
+        .url = std::move(url),
+        .priority = priority
+    };
+}
 
-    UpdateServerEvent().listen([](UpdateServerEventData* e) {
-        if (e->m_url != "") {
-            if (e->m_priority != 0) {
-                //ServerAPI::get()->updateURLAndPrio(e->m_id, e->m_url, e->m_priority);
-                ServerAPI::get()->doAndNotifyIfServerUpdate(&ServerAPI::updateURLAndPrio, e->sender, e->m_id, e->m_url, e->m_priority);
-            } else {
-                //ServerAPI::get()->updateURL(e->m_id, e->m_url);
-                ServerAPI::get()->doAndNotifyIfServerUpdate(&ServerAPI::updateURL, e->sender, e->m_id, e->m_url);
-            }
+void ServerAPIEvents::updateServer(int id, std::string url, int priority, Mod* sender) {
+    if (url != "") {
+        if (priority != 0) {
+            ServerAPI::get()->doAndNotifyIfServerUpdate(&ServerAPI::updateURLAndPrio, sender, id, std::move(url), priority);
         } else {
-            //ServerAPI::get()->updatePrio(e->m_id, e->m_priority);
-            ServerAPI::get()->doAndNotifyIfServerUpdate(&ServerAPI::updatePrio, e->sender, e->m_id, e->m_priority);
+            ServerAPI::get()->doAndNotifyIfServerUpdate(&ServerAPI::updateURL, sender, id, std::move(url));
         }
-        return ListenerResult::Stop;
-    }).leak();
+    } else {
+        ServerAPI::get()->doAndNotifyIfServerUpdate(&ServerAPI::updatePrio, sender, id, priority);
+    }
+}
 
-    RemoveServerEvent().listen([](RemoveServerEventData* e) {
-        //ServerAPI::get()->removeURL(e->m_id);
-        ServerAPI::get()->doAndNotifyIfServerUpdate(&ServerAPI::removeURL, e->sender, e->m_id);
-        return ListenerResult::Stop;
-    }).leak();
+void ServerAPIEvents::removeServer(int id, Mod* sender) {
+    ServerAPI::get()->doAndNotifyIfServerUpdate(&ServerAPI::removeURL, sender, id);
+}
 
-    GetBaseUrlEvent().listen([](GetBaseUrlEventData* e) {
-        e->m_url = ServerAPI::get()->getBaseUrl();
-        return ListenerResult::Stop;
-    }).leak();
+std::string ServerAPIEvents::getBaseUrl() {
+    return ServerAPI::get()->getBaseUrl();
+}
 
-    GetSecondaryUrlEvent().listen([](GetSecondaryUrlEventData* e) {
-        e->m_url = ServerAPI::get()->getSecondaryUrl();
-        return ListenerResult::Stop;
-    }).leak();
+std::string ServerAPIEvents::getSecondaryUrl() {
+    return ServerAPI::get()->getSecondaryUrl();
+}
 
-    GetRegisteredServersEvent().listen([](GetRegisteredServersEventData* e) {
-        e->m_servers = ServerAPI::get()->getAllServers();
-        return ListenerResult::Stop;
-    }).leak();
+std::map<int, std::pair<std::string, int>> ServerAPIEvents::getRegisteredServers() {
+    return ServerAPI::get()->getAllServers();
+}
 
-    GetTrustedModsEvent().listen([](GetTrustedModsEventData* e) {
-        e->trustedMods = ServerAPI::get()->getTrustedMods();
-        return ListenerResult::Stop;
-    }).leak();
+StringMap<ServerAPITrust::TrustLevel> ServerAPITrust::getTrustedMods() {
+    return ServerAPI::get()->getTrustedMods();
 }
